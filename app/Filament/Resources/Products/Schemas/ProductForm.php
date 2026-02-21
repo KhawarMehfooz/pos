@@ -51,11 +51,10 @@ class ProductForm
                             ->placeholder('0.00')
                             ->prefixIcon('heroicon-o-banknotes')
                             ->numeric()
-                            ->mask(RawJs::make('$money($input)'))
-                            ->minValue(0.01)
+                            ->minValue(0)
                             ->suffix('PKR')
                             ->required()
-                            ->rules(['numeric', 'min:0.01'])
+                            ->rules(['numeric', 'min:0'])
                             ->live()
                             ->columnSpan(1),
 
@@ -64,7 +63,6 @@ class ProductForm
                             ->placeholder('0.00')
                             ->prefixIcon('heroicon-o-banknotes')
                             ->numeric()
-                            ->mask(RawJs::make('$money($input)'))
                             ->suffix('PKR')
                             ->required()
                             ->live()
@@ -86,7 +84,6 @@ class ProductForm
                             ->placeholder('0.00')
                             ->prefixIcon('heroicon-o-receipt-percent')
                             ->numeric()
-                            ->mask(RawJs::make('$money($input)'))
                             ->suffix('PKR')
                             ->nullable()
                             ->live()
@@ -202,7 +199,9 @@ class ProductForm
                             ->label('Product Image')
                             ->image()
                             ->imageEditor()
-                            ->directory('products')
+                            ->disk('public')
+                            ->directory('product_images')
+                            ->visibility('public')
                             ->nullable()
                             ->columnSpan(1),
 

@@ -23,7 +23,7 @@ return new class extends Migration
 
             $table->decimal('purchase_price', 12, 2)->default(0);
             $table->decimal('retail_price', 12, 2)->default(0);
-            $table->decimal('sale_price', 12, 2)->default(0);
+            $table->decimal('sale_price', 12, 2)->default(0)->nullable();
 
             $table->string('product_image')->nullable();
 
