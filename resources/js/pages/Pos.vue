@@ -1,0 +1,7 @@
+<script setup lang="ts">
+import Header from '@/components/Pos/Header.vue';
+</script>
+
+<template>
+   <Header />
+</template>

@@ -32,7 +32,17 @@ class Product extends Model
         ];
     }
 
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
+    }
+
+    // this will only return those products whose are active and category is also active
+    public function scopeAvailableForSale($query)
+    {
+        return $query->where('is_active', true)
+            ->whereHas('category', function ($q) {
+                $q->where('is_active', true);
+            });
     }
 }

@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>POS Retail Theme — Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Sora:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary-50: #fffbeb; --primary-100: #fef3c7; --primary-200: #fde68a;
+    --primary-300: #fcd34d; --primary-400: #fbbf24; --primary-500: #f59e0b;
+    --primary-600: #d97706; --primary-700: #b45309; --primary-800: #92400e;
+    --primary-900: #78350f;
+
+    --secondary-50: #ecfdf5; --secondary-500: #10b981; --secondary-600: #059669;
+
+    --accent-50: #fff1f2; --accent-200: #fecdd3; --accent-500: #f43f5e;
+    --accent-600: #e11d48;
+
+    --neutral-50: #fafaf9; --neutral-100: #f5f5f4; --neutral-200: #e7e5e4;
+    --neutral-300: #d6d3d1; --neutral-400: #a8a29e; --neutral-500: #78716c;
+    --neutral-600: #57534e; --neutral-700: #44403c; --neutral-900: #1c1917;
+
+    --surface-base: #fffdf7; --surface-card: #ffffff;
+    --surface-raised: #fefce8; --surface-sunken: #f5f5f4;
+
+    --border-subtle: #e7e5e4; --border-default: #d6d3d1;
+
+    --text-primary: #1c1917; --text-secondary: #57534e; --text-muted: #a8a29e;
+
+    --shadow-sm: 0 1px 3px rgba(120,53,15,0.06),0 1px 2px rgba(120,53,15,0.04);
+    --shadow-md: 0 4px 12px rgba(120,53,15,0.08),0 2px 4px rgba(120,53,15,0.04);
+    --shadow-card: 0 0 0 1px #e7e5e4, var(--shadow-sm);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface-base);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: #fff;
+    border-bottom: 1px solid var(--border-subtle);
+    box-shadow: 0 1px 8px rgba(120,53,15,0.06);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .header-inner {
+    max-width: 1600px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 1.5rem; height: 60px; position: relative;
+  }
+  .header-left { display: flex; gap: .25rem; }
+  .store-name {
+    position: absolute; left: 50%; transform: translateX(-50%);
+    font-family: 'DM Mono', monospace; font-size: .8rem;
+    letter-spacing: .12em; text-transform: uppercase;
+    color: var(--text-secondary); white-space: nowrap;
+  }
+  .store-name span {
+    color: var(--primary-600); font-weight: 500;
+  }
+  .header-right { display: flex; gap: .25rem; }
+  .nav-btn {
+    display: flex; align-items: center; gap: .4rem;
+    padding: .4rem .8rem; border-radius: 8px; font-size: .82rem;
+    font-weight: 600; color: var(--neutral-500); border: none;
+    background: transparent; cursor: pointer; text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .nav-btn:hover { background: var(--primary-50); color: var(--primary-700); }
+  .nav-btn.danger:hover { background: var(--accent-50); color: var(--accent-600); }
+  .nav-btn svg { width: 15px; height: 15px; }
+  .logo-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--primary-500); display: inline-block; margin-right: .4rem;
+    box-shadow: 0 0 0 3px var(--primary-100);
+  }
+
+  /* ── LAYOUT ── */
+  .page { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+  .section-title {
+    font-family: 'Sora', sans-serif; font-size: .65rem; font-weight: 700;
+    letter-spacing: .15em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 1rem;
+    display: flex; align-items: center; gap: .6rem;
+  }
+  .section-title::after {
+    content: ''; flex: 1; height: 1px; background: var(--border-subtle);
+  }
+  .section { margin-bottom: 2.5rem; }
+
+  /* ── COLOR SWATCHES ── */
+  .swatch-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: .75rem;
+  }
+  .swatch {
+    border-radius: 10px; overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+  .swatch-color { height: 64px; }
+  .swatch-info { background: #fff; padding: .5rem .6rem; }
+  .swatch-name { font-size: .72rem; font-weight: 600; color: var(--text-secondary); }
+  .swatch-hex { font-family: 'DM Mono', monospace; font-size: .65rem; color: var(--text-muted); }
+
+  .palette-row { display: flex; gap: 4px; border-radius: 10px; overflow: hidden; margin-bottom: .5rem; height: 48px; }
+  .palette-cell { flex: 1; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 4px; }
+  .palette-cell span { font-family: 'DM Mono', monospace; font-size: .55rem; color: rgba(255,255,255,0.7); }
+
+  /* ── COMPONENTS ── */
+  .btn-row { display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+
+  .btn { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem 1rem;
+    border-radius: 8px; font-size: .85rem; font-weight: 600;
+    border: none; cursor: pointer; transition: all .12s; text-decoration: none; }
+  .btn-primary { background: var(--primary-500); color: #fff; box-shadow: var(--shadow-sm); }
+  .btn-primary:hover { background: var(--primary-600); }
+  .btn-secondary { background: var(--secondary-500); color: #fff; box-shadow: var(--shadow-sm); }
+  .btn-secondary:hover { background: var(--secondary-600); }
+  .btn-danger { background: var(--accent-500); color: #fff; box-shadow: var(--shadow-sm); }
+  .btn-danger:hover { background: var(--accent-600); }
+  .btn-ghost { background: transparent; color: var(--neutral-600); }
+  .btn-ghost:hover { background: var(--neutral-100); }
+  .btn-outline {
+    background: #fff; color: var(--neutral-700);
+    border: 1.5px solid var(--border-default); box-shadow: var(--shadow-sm);
+  }
+  .btn-outline:hover { border-color: var(--primary-400); color: var(--primary-600); background: var(--primary-50); }
+
+  /* ── BADGES ── */
+  .badge-row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+  .badge { display: inline-flex; align-items: center; gap: .3rem;
+    padding: .25rem .7rem; border-radius: 999px; font-size: .72rem; font-weight: 700; }
+  .badge-sale     { background: #ecfdf5; color: #059669; }
+  .badge-refund   { background: #fff1f2; color: #e11d48; }
+  .badge-pending  { background: #fffbeb; color: #d97706; }
+  .badge-void     { background: #f5f5f4; color: #78716c; }
+  .badge-discount { background: #ffe4e6; color: #e11d48; }
+  .badge-info     { background: #eff6ff; color: #2563eb; }
+
+  /* ── CARDS ── */
+  .cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+  .card {
+    background: var(--surface-card); border-radius: 12px;
+    border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card);
+    padding: 1.25rem; transition: box-shadow .2s, border-color .2s;
+  }
+  .card:hover { border-color: var(--border-default); box-shadow: var(--shadow-md); }
+  .card-label { font-size: .7rem; font-weight: 700; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--text-muted); margin-bottom: .4rem; }
+  .card-value { font-family: 'DM Mono', monospace; font-size: 1.8rem;
+    font-weight: 700; color: var(--text-primary); line-height: 1; }
+  .card-sub { font-size: .78rem; color: var(--text-muted); margin-top: .35rem; }
+  .card-trend-up { color: var(--secondary-500); font-weight: 600; font-size: .78rem; }
+  .card-trend-dn { color: var(--accent-500); font-weight: 600; font-size: .78rem; }
+
+  /* Product card */
+  .product-card {
+    background: var(--surface-card); border-radius: 12px;
+    border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card);
+    padding: .9rem; cursor: pointer; transition: all .12s;
+  }
+  .product-card:hover { border-color: var(--primary-300); background: #fffbeb44; transform: scale(1.01); }
+  .product-card:active { transform: scale(0.98); }
+  .product-thumb {
+    width: 100%; aspect-ratio: 1; border-radius: 8px;
+    background: var(--primary-50); display: flex; align-items: center;
+    justify-content: center; font-size: 2rem; margin-bottom: .7rem;
+    border: 1px solid var(--primary-100);
+  }
+  .product-name { font-size: .85rem; font-weight: 600; color: var(--text-primary); margin-bottom: .15rem; }
+  .product-sku { font-family: 'DM Mono', monospace; font-size: .7rem; color: var(--text-muted); }
+  .product-row { display: flex; align-items: center; justify-content: space-between; margin-top: .5rem; }
+  .product-price { font-family: 'DM Mono', monospace; font-size: 1rem; font-weight: 700; color: var(--primary-700); }
+  .stock-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .stock-in  { background: #16a34a; }
+  .stock-low { background: #f97316; }
+  .stock-out { background: #dc2626; }
+
+  /* ── RECEIPT ── */
+  .receipt {
+    background: var(--surface-card); border-radius: 12px;
+    border: 1px solid var(--border-subtle); box-shadow: var(--shadow-card);
+    padding: 1.25rem; max-width: 300px;
+    font-family: 'DM Mono', monospace; font-size: .82rem;
+  }
+  .receipt-header { text-align: center; margin-bottom: 1rem; }
+  .receipt-store { font-family: 'Sora', sans-serif; font-size: 1rem; font-weight: 700; color: var(--primary-700); }
+  .receipt-date { font-size: .7rem; color: var(--text-muted); margin-top: .2rem; }
+  .receipt-divider { border: none; border-top: 1.5px dashed var(--border-default); margin: .75rem 0; }
+  .receipt-row { display: flex; justify-content: space-between; padding: .2rem 0; color: var(--text-secondary); }
+  .receipt-row.total { color: var(--text-primary); font-weight: 700; font-size: .95rem; margin-top: .3rem; }
+  .receipt-row.discount { color: var(--accent-600); }
+  .receipt-row.tax { color: var(--text-muted); font-size: .75rem; }
+  .receipt-change { text-align: center; margin-top: .75rem; font-size: .75rem; color: var(--text-muted); }
+  .receipt-change strong { color: var(--secondary-600); font-size: 1rem; }
+
+  /* ── INPUT ── */
+  .input {
+    width: 100%; padding: .55rem .85rem; border-radius: 8px;
+    border: 1.5px solid var(--border-default); background: var(--surface-sunken);
+    font-family: 'DM Sans', sans-serif; font-size: .875rem;
+    color: var(--text-primary); outline: none; transition: all .15s;
+  }
+  .input:focus { border-color: var(--primary-400); box-shadow: 0 0 0 3px rgba(245,158,11,.15); }
+  .input::placeholder { color: var(--text-muted); }
+  .input-group { display: flex; flex-direction: column; gap: .35rem; max-width: 280px; }
+  .input-label { font-size: .78rem; font-weight: 600; color: var(--text-secondary); }
+
+  /* ── TABLE ── */
+  .pos-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+  .pos-table thead tr { background: var(--neutral-100); }
+  .pos-table thead th { padding: .65rem 1rem; text-align: left; font-size: .7rem;
+    font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--text-muted); }
+  .pos-table tbody tr { border-top: 1px solid var(--border-subtle); transition: background .1s; }
+  .pos-table tbody tr:hover { background: rgba(255,251,235,.5); }
+  .pos-table tbody td { padding: .75rem 1rem; color: var(--text-secondary); }
+  .pos-table tbody td.amount { font-family: 'DM Mono', monospace; color: var(--text-primary); font-weight: 600; }
+  .table-wrap { background: var(--surface-card); border-radius: 12px;
+    border: 1px solid var(--border-subtle); overflow: hidden; box-shadow: var(--shadow-card); }
+
+  /* ── PRICE DISPLAY ── */
+  .price-display { font-family: 'DM Mono', monospace; font-weight: 700;
+    color: var(--text-primary); tabular-nums; }
+  .price-xl { font-size: 3.5rem; }
+  .price-lg { font-size: 2.5rem; }
+  .price-md { font-size: 1.5rem; }
+
+  .pos-total-panel {
+    background: var(--primary-700); color: #fff; border-radius: 14px;
+    padding: 1.5rem; display: flex; flex-direction: column; gap: .5rem;
+    box-shadow: var(--shadow-lg);
+  }
+  .pos-total-label { font-size: .7rem; font-weight: 700; letter-spacing: .12em;
+    text-transform: uppercase; opacity: .6; }
+  .pos-total-amount { font-family: 'DM Mono', monospace; font-size: 3rem;
+    font-weight: 700; line-height: 1; }
+  .pos-charge-btn {
+    margin-top: .5rem; padding: .85rem; border-radius: 10px; border: none;
+    background: var(--primary-400); color: var(--primary-900);
+    font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 700;
+    cursor: pointer; transition: background .15s; letter-spacing: .02em;
+  }
+  .pos-charge-btn:hover { background: var(--primary-300); }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <a href="#" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+    </div>
+    <div class="store-name">
+      <span class="logo-dot"></span>POINT OF SALE SYSTEM
+    </div>
+    <div class="header-right">
+      <a href="#" class="nav-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+      <button class="nav-btn danger">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ── PAGE ── -->
+<div class="page">
+
+  <!-- PALETTE -->
+  <div class="section">
+    <div class="section-title">Color Palette</div>
+
+    <p style="font-size:.8rem;color:var(--text-muted);margin-bottom:1rem;">Primary · Amber/Saffron — Secondary · Emerald — Accent · Coral Red — Neutral · Warm Stone</p>
+
+    <div style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:1.25rem;">
+      <div class="palette-row">
+        <div class="palette-cell" style="background:#fffbeb;"><span style="color:#d97706">50</span></div>
+        <div class="palette-cell" style="background:#fef3c7;"><span style="color:#d97706">100</span></div>
+        <div class="palette-cell" style="background:#fde68a;"><span style="color:#92400e">200</span></div>
+        <div class="palette-cell" style="background:#fcd34d;"><span style="color:#92400e">300</span></div>
+        <div class="palette-cell" style="background:#fbbf24;"><span>400</span></div>
+        <div class="palette-cell" style="background:#f59e0b;"><span>500★</span></div>
+        <div class="palette-cell" style="background:#d97706;"><span>600</span></div>
+        <div class="palette-cell" style="background:#b45309;"><span>700</span></div>
+        <div class="palette-cell" style="background:#92400e;"><span>800</span></div>
+        <div class="palette-cell" style="background:#78350f;"><span>900</span></div>
+      </div>
+      <div style="font-size:.7rem;color:var(--text-muted);font-family:'DM Mono',monospace;">PRIMARY — Amber</div>
+
+      <div class="palette-row" style="margin-top:.5rem;">
+        <div class="palette-cell" style="background:#ecfdf5;"><span style="color:#059669">50</span></div>
+        <div class="palette-cell" style="background:#d1fae5;"><span style="color:#059669">100</span></div>
+        <div class="palette-cell" style="background:#a7f3d0;"><span style="color:#047857">200</span></div>
+        <div class="palette-cell" style="background:#6ee7b7;"><span style="color:#047857">300</span></div>
+        <div class="palette-cell" style="background:#34d399;"><span>400</span></div>
+        <div class="palette-cell" style="background:#10b981;"><span>500★</span></div>
+        <div class="palette-cell" style="background:#059669;"><span>600</span></div>
+        <div class="palette-cell" style="background:#047857;"><span>700</span></div>
+        <div class="palette-cell" style="background:#065f46;"><span>800</span></div>
+        <div class="palette-cell" style="background:#064e3b;"><span>900</span></div>
+      </div>
+      <div style="font-size:.7rem;color:var(--text-muted);font-family:'DM Mono',monospace;">SECONDARY — Emerald</div>
+
+      <div class="palette-row" style="margin-top:.5rem;">
+        <div class="palette-cell" style="background:#fff1f2;"><span style="color:#e11d48">50</span></div>
+        <div class="palette-cell" style="background:#ffe4e6;"><span style="color:#e11d48">100</span></div>
+        <div class="palette-cell" style="background:#fecdd3;"><span style="color:#be123c">200</span></div>
+        <div class="palette-cell" style="background:#fda4af;"><span style="color:#be123c">300</span></div>
+        <div class="palette-cell" style="background:#fb7185;"><span>400</span></div>
+        <div class="palette-cell" style="background:#f43f5e;"><span>500★</span></div>
+        <div class="palette-cell" style="background:#e11d48;"><span>600</span></div>
+        <div class="palette-cell" style="background:#be123c;"><span>700</span></div>
+        <div class="palette-cell" style="background:#9f1239;"><span>800</span></div>
+        <div class="palette-cell" style="background:#881337;"><span>900</span></div>
+      </div>
+      <div style="font-size:.7rem;color:var(--text-muted);font-family:'DM Mono',monospace;">ACCENT — Coral Red (discounts, alerts)</div>
+
+      <div class="palette-row" style="margin-top:.5rem;">
+        <div class="palette-cell" style="background:#fafaf9;"><span style="color:#78716c">50</span></div>
+        <div class="palette-cell" style="background:#f5f5f4;"><span style="color:#78716c">100</span></div>
+        <div class="palette-cell" style="background:#e7e5e4;"><span style="color:#57534e">200</span></div>
+        <div class="palette-cell" style="background:#d6d3d1;"><span style="color:#44403c">300</span></div>
+        <div class="palette-cell" style="background:#a8a29e;"><span>400</span></div>
+        <div class="palette-cell" style="background:#78716c;"><span>500</span></div>
+        <div class="palette-cell" style="background:#57534e;"><span>600</span></div>
+        <div class="palette-cell" style="background:#44403c;"><span>700</span></div>
+        <div class="palette-cell" style="background:#292524;"><span>800</span></div>
+        <div class="palette-cell" style="background:#1c1917;"><span>900</span></div>
+      </div>
+      <div style="font-size:.7rem;color:var(--text-muted);font-family:'DM Mono',monospace;">NEUTRAL — Warm Stone</div>
+    </div>
+
+    <!-- Semantic swatches -->
+    <div class="swatch-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#fffdf7;border:1px solid #e7e5e4"></div><div class="swatch-info"><div class="swatch-name">Surface Base</div><div class="swatch-hex">#fffdf7</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#ffffff;border:1px solid #e7e5e4"></div><div class="swatch-info"><div class="swatch-name">Surface Card</div><div class="swatch-hex">#ffffff</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#fefce8"></div><div class="swatch-info"><div class="swatch-name">Surface Raised</div><div class="swatch-hex">#fefce8</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#f5f5f4"></div><div class="swatch-info"><div class="swatch-name">Surface Sunken</div><div class="swatch-hex">#f5f5f4</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#10b981"></div><div class="swatch-info"><div class="swatch-name">Sale / Success</div><div class="swatch-hex">#10b981</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#f43f5e"></div><div class="swatch-info"><div class="swatch-name">Refund / Danger</div><div class="swatch-hex">#f43f5e</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#f59e0b"></div><div class="swatch-info"><div class="swatch-name">Pending / Warn</div><div class="swatch-hex">#f59e0b</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#78716c"></div><div class="swatch-info"><div class="swatch-name">Void / Neutral</div><div class="swatch-hex">#78716c</div></div></div>
+    </div>
+  </div>
+
+  <!-- TYPOGRAPHY -->
+  <div class="section">
+    <div class="section-title">Typography</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+      <div>
+        <p style="font-size:.7rem;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:.5rem;">DISPLAY — Sora 700</p>
+        <p style="font-family:'Sora',sans-serif;font-size:2rem;font-weight:700;color:var(--text-primary);line-height:1.1;">Total Due<br><span style="color:var(--primary-600);">$1,248.50</span></p>
+      </div>
+      <div>
+        <p style="font-size:.7rem;color:var(--text-muted);font-family:'DM Mono',monospace;margin-bottom:.5rem;">MONO — DM Mono 500</p>
+        <p style="font-family:'DM Mono',monospace;font-size:1.5rem;font-weight:500;color:var(--text-primary);">SKU-00124-BLK<br><span style="color:var(--text-muted);font-size:.9rem;">REF#: TXN-20240222-088</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <div class="section">
+    <div class="section-title">Buttons</div>
+    <div class="btn-row">
+      <button class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Sale
+      </button>
+      <button class="btn btn-secondary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Charge
+      </button>
+      <button class="btn btn-danger">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        Void
+      </button>
+      <button class="btn btn-outline">Refund</button>
+      <button class="btn btn-ghost">Cancel</button>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div class="section">
+    <div class="section-title">Status Badges</div>
+    <div class="badge-row">
+      <span class="badge badge-sale">● Completed</span>
+      <span class="badge badge-pending">● Pending</span>
+      <span class="badge badge-refund">● Refund</span>
+      <span class="badge badge-void">● Void</span>
+      <span class="badge badge-discount">🏷 −15% OFF</span>
+      <span class="badge badge-info">ℹ On Hold</span>
+    </div>
+  </div>
+
+  <!-- CARDS + PRODUCTS -->
+  <div class="section">
+    <div class="section-title">Dashboard Cards</div>
+    <div class="cards-grid">
+      <div class="card">
+        <div class="card-label">Today's Revenue</div>
+        <div class="card-value">$4,821</div>
+        <div class="card-sub"><span class="card-trend-up">↑ 12.4%</span> vs yesterday</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Transactions</div>
+        <div class="card-value">138</div>
+        <div class="card-sub"><span class="card-trend-up">↑ 8</span> from last shift</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Refunds</div>
+        <div class="card-value" style="color:var(--accent-500)">3</div>
+        <div class="card-sub"><span class="card-trend-dn">↓ 2</span> vs yesterday</div>
+      </div>
+      <div class="card">
+        <div class="card-label">Low Stock Items</div>
+        <div class="card-value" style="color:#f97316">7</div>
+        <div class="card-sub">Needs reorder soon</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCT CARDS -->
+  <div class="section">
+    <div class="section-title">Product Cards</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.75rem;">
+      <div class="product-card">
+        <div class="product-thumb">☕</div>
+        <div class="product-name">Arabica Blend</div>
+        <div class="product-sku">SKU-0042</div>
+        <div class="product-row">
+          <span class="product-price">$12.99</span>
+          <span class="stock-dot stock-in" title="In Stock"></span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb">👜</div>
+        <div class="product-name">Tote Bag L</div>
+        <div class="product-sku">SKU-0107</div>
+        <div class="product-row">
+          <span class="product-price">$24.00</span>
+          <span class="stock-dot stock-low" title="Low Stock"></span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb">🧴</div>
+        <div class="product-name">Hand Cream</div>
+        <div class="product-sku">SKU-0088</div>
+        <div class="product-row">
+          <span class="product-price">$8.50</span>
+          <span class="stock-dot stock-out" title="Out of Stock"></span>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-thumb">📦</div>
+        <div class="product-name">Gift Box Set</div>
+        <div class="product-sku">SKU-0201</div>
+        <div class="product-row">
+          <span class="product-price">$39.99</span>
+          <span class="stock-dot stock-in" title="In Stock"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE + RECEIPT + TOTAL PANEL -->
+  <div style="display:grid;grid-template-columns:1fr auto auto;gap:1.5rem;align-items:start;" class="section">
+
+    <div>
+      <div class="section-title">Transaction Table</div>
+      <div class="table-wrap">
+        <table class="pos-table">
+          <thead>
+            <tr>
+              <th>Item</th><th>Qty</th><th>Price</th><th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Arabica Blend 250g</td><td>2</td>
+              <td class="amount">$25.98</td>
+              <td><span class="badge badge-sale" style="font-size:.65rem;">● Sold</span></td>
+            </tr>
+            <tr>
+              <td>Tote Bag L</td><td>1</td>
+              <td class="amount">$24.00</td>
+              <td><span class="badge badge-pending" style="font-size:.65rem;">● Pending</span></td>
+            </tr>
+            <tr>
+              <td>Hand Cream 50ml</td><td>3</td>
+              <td class="amount">$25.50</td>
+              <td><span class="badge badge-refund" style="font-size:.65rem;">● Refund</span></td>
+            </tr>
+            <tr>
+              <td>Gift Box Set</td><td>1</td>
+              <td class="amount">$39.99</td>
+              <td><span class="badge badge-void" style="font-size:.65rem;">● Void</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- RECEIPT -->
+    <div>
+      <div class="section-title">Receipt</div>
+      <div class="receipt">
+        <div class="receipt-header">
+          <div class="receipt-store">My Store</div>
+          <div class="receipt-date">22 Feb 2026 · 14:32</div>
+        </div>
+        <hr class="receipt-divider">
+        <div class="receipt-row"><span>Arabica × 2</span><span>$25.98</span></div>
+        <div class="receipt-row"><span>Tote Bag L</span><span>$24.00</span></div>
+        <div class="receipt-row"><span>Hand Cream × 3</span><span>$25.50</span></div>
+        <div class="receipt-row discount"><span>Discount 10%</span><span>−$7.55</span></div>
+        <hr class="receipt-divider">
+        <div class="receipt-row tax"><span>Tax (8%)</span><span>$5.43</span></div>
+        <div class="receipt-row total"><span>TOTAL</span><span>$73.36</span></div>
+        <hr class="receipt-divider">
+        <div class="receipt-change">Cash: $100.00<br>Change: <strong>$26.64</strong></div>
+      </div>
+    </div>
+
+    <!-- TOTAL PANEL -->
+    <div>
+      <div class="section-title">Charge Panel</div>
+      <div class="pos-total-panel" style="min-width:200px;">
+        <div class="pos-total-label">Total Due</div>
+        <div class="pos-total-amount">$73.36</div>
+        <div style="font-family:'DM Mono',monospace;font-size:.75rem;opacity:.5;margin-top:-.25rem;">4 items · 1 discount</div>
+        <button class="pos-charge-btn">⚡ Charge Now</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- INPUTS -->
+  <div class="section">
+    <div class="section-title">Form Inputs</div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <div class="input-group">
+        <label class="input-label">Search Products</label>
+        <input class="input" type="text" placeholder="Search by name or SKU…" />
+      </div>
+      <div class="input-group">
+        <label class="input-label">Discount Code</label>
+        <input class="input" type="text" placeholder="Enter code…" />
+      </div>
+      <div class="input-group">
+        <label class="input-label">Cash Tendered</label>
+        <input class="input" type="number" placeholder="$0.00" style="font-family:'DM Mono',monospace;" />
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
