@@ -17,6 +17,13 @@ class Category extends Model
         'is_active',
     ];
 
+    protected $hidden = [
+        // 'is_active',
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
+
     public function parentCategory()
     {
         return $this->belongsTo(Category::class, 'parent_id');

@@ -5,7 +5,8 @@ export * from './ui';
 export interface Category {
   id: number
   category_name: string
-  parent_id: number | null
+  parent_id: number | null,
+  children: Category[]
 }
 
 export interface Product {

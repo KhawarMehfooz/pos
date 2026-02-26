@@ -20,7 +20,13 @@ Route::get('dashboard', function () {
 
 Route::get('pos',function(){
     return Inertia::render('Pos',[
-        'categories' => Category::active()->get(),
+        'categories' => Category::active()
+                            ->topLevel()
+                            ->with(
+                                [
+                                    'children' => fn ($query) => $query->active()
+                                ]
+                            )->get(),
         'products' => Product::availableForSale()->get(),
         'customers' => Customer::orderBy('customer_name')->limit(10)->get()
     ]);
