@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { usePage } from '@inertiajs/vue3';
 import Header from '@/components/Pos/Header.vue';
+import ProductCard from '@/components/Pos/ProductCard.vue';
 import type { Paginated, Product } from '@/types';
+import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 
 const page = usePage<{
     products: Paginated<Product>;
@@ -13,75 +15,89 @@ const products = page.props.products;
 <template>
     <Header />
 
-    <section
-        class="mx-auto my-[0.9rem] grid max-w-400 grid-cols-[minmax(0,70%)_minmax(0,30%)] gap-4"
-    >
-        <!-- Products -->
-        <div>
-            <ul
-                class="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-[0.9rem]"
-                role="list"
+    <div class="pos-layout">
+        <div class="product-panel">
+            <!-- toolbar -->
+            <div class="panel-toolbar">
+                <div class="search-wrap">
+                    <svg
+                        class="search-icon"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                        class="search-input"
+                        type="text"
+                        placeholder="Search products or scan barcode…"
+                        id="searchInput"
+                        oninput="filterProducts(this.value)"
+                    />
+                </div>
+                <button
+                    class="toolbar-btn"
+                    id="barcodeBtn"
+                    onclick="toggleBarcode()"
+                >
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <rect x="3" y="5" width="2" height="14" />
+                        <rect x="7" y="5" width="1" height="14" />
+                        <rect x="10" y="5" width="2" height="14" />
+                        <rect x="14" y="5" width="1" height="14" />
+                        <rect x="17" y="5" width="2" height="14" />
+                        <rect x="21" y="5" width="1" height="14" />
+                    </svg>
+                    Barcode
+                </button>
+                <button class="toolbar-btn">
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+                        <line x1="8" y1="6" x2="21" y2="6" />
+                        <line x1="8" y1="12" x2="21" y2="12" />
+                        <line x1="8" y1="18" x2="21" y2="18" />
+                        <line x1="3" y1="6" x2="3.01" y2="6" />
+                        <line x1="3" y1="12" x2="3.01" y2="12" />
+                        <line x1="3" y1="18" x2="3.01" y2="18" />
+                    </svg>
+                    Filter
+                </button>
+            </div>
+
+            <CategoryTabs />
+
+            <section
+                class=""
             >
-                <li v-for="product in products.data" :key="product.id">
-                    <article class="product-card" title="Add to cart">
-                        <figure class="product-thumb">
-                            <img
-                                :src="product.product_image_url"
-                                :alt="product.product_name"
-                            />
-                        </figure>
+                <!-- Products -->
+                <div class="product-grid-wrap">
+                    <ul
+                        class="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-[0.9rem]"
+                        role="list"
+                    >
+                        <li v-for="product in products.data" :key="product.id">
+                            <ProductCard :product="product" />
+                        </li>
+                    </ul>
+                </div>
 
-                        <h3 class="product-name" :title="product.product_name">
-                            {{ product.product_name }}
-                        </h3>
-
-                        <p class="product-sku">
-                            {{ product.sku }}
-                        </p>
-
-                        <footer class="product-row">
-                            <span class="product-price">
-                                <template v-if="product.sale_price">
-                                    <span class="sale-price">
-                                        PKR {{ product.sale_price }}
-                                    </span>
-                                    <span
-                                        class="price-old retail-price block line-through"
-                                    >
-                                        PKR {{ product.retail_price }}
-                                    </span>
-                                </template>
-                                <template v-else>
-                                    PKR {{ product.retail_price }}
-                                </template>
-                            </span>
-
-                            <span
-                                class="stock-dot"
-                                :class="
-                                    !product.track_stock ||
-                                    product.stock_quantity > 0
-                                        ? 'stock-in'
-                                        : 'stock-out'
-                                "
-                                :title="
-                                    !product.track_stock
-                                        ? 'Stock Not Tracked'
-                                        : product.stock_quantity > 0
-                                          ? 'In Stock'
-                                          : 'Out of Stock'
-                                "
-                                aria-hidden="true"
-                            ></span>
-                        </footer>
-                    </article>
-                </li>
-            </ul>
+                <!-- Cart -->
+                <aside class="cart-panel">
+                    <!-- cart goes here -->
+                </aside>
+            </section>
         </div>
-
-        <!-- Cart (30%) -->
-        <aside class="cart-panel">
-            <!-- cart goes here -->
-        </aside>
-    </section>
+    </div>
 </template>
