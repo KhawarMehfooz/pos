@@ -1,25 +1,60 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
+import { debounce } from 'lodash';
 import {
     Barcode,
     Check,
     Minus,
     Pause,
     Plus,
+    Search,
     ShoppingCart,
     Tag,
     Trash,
     UserRound,
     X,
 } from 'lucide-vue-next';
+import { ref } from 'vue';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 import Header from '@/components/Pos/Header.vue';
 import ProductCard from '@/components/Pos/ProductCard.vue';
-import type { Paginated, Product } from '@/types';
+import type { Category, Paginated, Product } from '@/types';
 
-defineProps<{
+const props = defineProps<{
     products: Paginated<Product>;
+    categories: Category[];
+    activeCategoryId?: number;
 }>();
+
+const searchTerm = ref('');
+const activeCategoryId = ref(props.activeCategoryId ?? 0);
+
+function filterByCategory(categoryId: number) {
+    activeCategoryId.value = categoryId;
+    router.get(
+        '/pos',
+        { category: categoryId, search: searchTerm.value },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['products', 'activeCategoryId'],
+        },
+    );
+}
+
+function searchProducts() {
+    router.get(
+        '/pos',
+        { category: activeCategoryId.value, search: searchTerm.value },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['products', 'activeCategoryId'],
+        },
+    );
+}
+
+const debouncedSearch = debounce(searchProducts, 500);
 
 function goToPage(url: string | null) {
     if (!url) return;
@@ -50,22 +85,14 @@ function formatLabel(label: string) {
             <!-- toolbar -->
             <div class="panel-toolbar">
                 <div class="search-wrap">
-                    <svg
-                        class="search-icon"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <circle cx="11" cy="11" r="8" />
-                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                    </svg>
+                    <Search class="search-icon" />
                     <input
+                        v-model="searchTerm"
+                        @input="debouncedSearch"
                         class="search-input"
                         type="text"
                         placeholder="Search products or scan barcode…"
                         id="searchInput"
-                        oninput="filterProducts(this.value)"
                     />
                 </div>
                 <button class="toolbar-btn" id="barcodeBtn">
@@ -74,7 +101,11 @@ function formatLabel(label: string) {
                 </button>
             </div>
 
-            <CategoryTabs />
+            <CategoryTabs
+                :categories="categories"
+                :activeCategoryId="activeCategoryId"
+                @update:category="filterByCategory"
+            />
 
             <section class="product-grid-wrap">
                 <ul
@@ -86,9 +117,12 @@ function formatLabel(label: string) {
                     </li>
                 </ul>
 
-                <hr class="my-4 border-0 h-px" style="background: hsl(var(--border) / 0.6)">
+                <hr
+                    class="my-4 h-px border-0"
+                    style="background: hsl(var(--border) / 0.6)"
+                />
                 <!-- Pagination -->
-                <div class=" flex flex-wrap items-center justify-center">
+                <div class="flex flex-wrap items-center justify-center">
                     <button
                         v-for="link in products.links"
                         :key="link.label"
@@ -149,254 +183,6 @@ function formatLabel(label: string) {
                 </div>
 
                 <!-- cart item -->
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
-                        <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
-                        </div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button class="qty-btn minus">
-                                <Minus />
-                            </button>
-                            <input
-                                type="number"
-                                class="qty-value"
-                                min="0"
-                                step="1"
-                            />
-                            <button class="qty-btn">
-                                <Plus />
-                            </button>
-                        </div>
-                        <div class="cart-item-total">$12.99</div>
-                    </div>
-                    <button class="item-delete">
-                        <X />
-                    </button>
-                </div>
-
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
-                        <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
-                        </div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button class="qty-btn minus">
-                                <Minus />
-                            </button>
-                            <input
-                                type="number"
-                                class="qty-value"
-                                min="0"
-                                step="1"
-                            />
-                            <button class="qty-btn">
-                                <Plus />
-                            </button>
-                        </div>
-                        <div class="cart-item-total">$12.99</div>
-                    </div>
-                    <button class="item-delete">
-                        <X />
-                    </button>
-                </div>
-
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
-                        <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
-                        </div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button class="qty-btn minus">
-                                <Minus />
-                            </button>
-                            <input
-                                type="number"
-                                class="qty-value"
-                                min="0"
-                                step="1"
-                            />
-                            <button class="qty-btn">
-                                <Plus />
-                            </button>
-                        </div>
-                        <div class="cart-item-total">$12.99</div>
-                    </div>
-                    <button class="item-delete">
-                        <X />
-                    </button>
-                </div>
-
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
-                        <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
-                        </div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button class="qty-btn minus">
-                                <Minus />
-                            </button>
-                            <input
-                                type="number"
-                                class="qty-value"
-                                min="0"
-                                step="1"
-                            />
-                            <button class="qty-btn">
-                                <Plus />
-                            </button>
-                        </div>
-                        <div class="cart-item-total">$12.99</div>
-                    </div>
-                    <button class="item-delete">
-                        <X />
-                    </button>
-                </div>
-
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
-                        <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
-                        </div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button class="qty-btn minus">
-                                <Minus />
-                            </button>
-                            <input
-                                type="number"
-                                class="qty-value"
-                                min="0"
-                                step="1"
-                            />
-                            <button class="qty-btn">
-                                <Plus />
-                            </button>
-                        </div>
-                        <div class="cart-item-total">$12.99</div>
-                    </div>
-                    <button class="item-delete">
-                        <X />
-                    </button>
-                </div>
-
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
-                        <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
-                        </div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button class="qty-btn minus">
-                                <Minus />
-                            </button>
-                            <input
-                                type="number"
-                                class="qty-value"
-                                min="0"
-                                step="1"
-                            />
-                            <button class="qty-btn">
-                                <Plus />
-                            </button>
-                        </div>
-                        <div class="cart-item-total">$12.99</div>
-                    </div>
-                    <button class="item-delete">
-                        <X />
-                    </button>
-                </div>
-
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
-                        <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
-                        </div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button class="qty-btn minus">
-                                <Minus />
-                            </button>
-                            <input
-                                type="number"
-                                class="qty-value"
-                                min="0"
-                                step="1"
-                            />
-                            <button class="qty-btn">
-                                <Plus />
-                            </button>
-                        </div>
-                        <div class="cart-item-total">$12.99</div>
-                    </div>
-                    <button class="item-delete">
-                        <X />
-                    </button>
-                </div>
-
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
-                        <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
-                        </div>
-                    </div>
-                    <div class="cart-item-controls">
-                        <div class="qty-control">
-                            <button class="qty-btn minus">
-                                <Minus />
-                            </button>
-                            <input
-                                type="number"
-                                class="qty-value"
-                                min="0"
-                                step="1"
-                            />
-                            <button class="qty-btn">
-                                <Plus />
-                            </button>
-                        </div>
-                        <div class="cart-item-total">$12.99</div>
-                    </div>
-                    <button class="item-delete">
-                        <X />
-                    </button>
-                </div>
-
                 <div class="cart-item">
                     <div class="cart-item-thumb">☕</div>
                     <div class="cart-item-info">

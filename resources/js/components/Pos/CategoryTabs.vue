@@ -1,33 +1,46 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
+import {  ref, computed } from 'vue';
 import type { Category } from '@/types';
 
-const page = usePage();
+const props = defineProps<{
+    categories: Category[];
+    activeCategoryId: number;
+}>();
 
-const categories = ref<Category[]>(page.props.categories as Category[]);
+const emit = defineEmits<{
+    (e: 'update:category', categoryId: number): void;
+}>();
 
-const activeParent = ref<Category | null>(null);
+const allCategory: Category = { id: 0, category_name: 'All', parent_id: null, children: [] };
 
-const parentCategories = computed(() =>
-    categories.value.filter((category) => category.parent_id === null),
+const categoriesWithAll = computed(() => [allCategory, ...props.categories]);
+
+const activeCategory = ref(
+    categoriesWithAll.value.find(c => c.id === props.activeCategoryId) || allCategory
 );
+
+function selectCategory(category: Category) {
+    activeCategory.value = category;
+    emit('update:category', category.id);
+}
 </script>
 
 <template>
-    <nav class="categories-wrapper">
-        <ul
-            class="no-scrollbar flex flex-nowrap items-center gap-4 overflow-x-auto p-1"
-        >
-            <li
-                v-for="category in parentCategories"
-                :key="category.id"
-                class="min-w-fit cursor-pointer rounded-[6px] border border-dashed border-amber-200 bg-amber-50 px-4 py-1 text-xs whitespace-nowrap hover:border-amber-300 hover:bg-amber-100"
-                @mouseenter="activeParent = category"
-                @click="activeParent = category"
-            >
-                {{ category.category_name }}
-            </li>
-        </ul>
-    </nav>
+  <nav class="categories-wrapper">
+    <ul class="no-scrollbar flex gap-2 overflow-x-auto p-1">
+      <li
+        v-for="category in categoriesWithAll"
+        :key="category.id"
+        :class="[
+          'cursor-pointer px-4 py-1 rounded-[6px] border border-dashed text-xs whitespace-nowrap transition',
+          activeCategory.id === category.id
+            ? 'border-amber-400 bg-amber-200'
+            : 'border-amber-200 bg-amber-50 hover:border-amber-300 hover:bg-amber-100'
+        ]"
+        @click="selectCategory(category)"
+      >
+        {{ category.category_name }}
+      </li>
+    </ul>
+  </nav>
 </template>
