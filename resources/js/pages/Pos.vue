@@ -18,7 +18,7 @@ import { ref } from 'vue';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 import Header from '@/components/Pos/Header.vue';
 import ProductCard from '@/components/Pos/ProductCard.vue';
-import type { Category, Paginated, Product } from '@/types';
+import { CartItem, type Category, type Paginated, type Product } from '@/types';
 
 const props = defineProps<{
     products: Paginated<Product>;
@@ -75,6 +75,69 @@ function formatLabel(label: string) {
     if (label.includes('Next')) return 'Next';
     return label;
 }
+
+const cartItems = ref<Product[]>([]);
+const cart = ref<CartItem[]>([]);
+
+/**
+ * Add product to cart
+ */
+function addToCart(product: Product) {
+    const existing = cart.value.find((item) => item.product.id === product.id);
+
+    if (existing) {
+        // Increment quantity but not above stock
+        if (
+            !product.track_stock ||
+            existing.quantity < product.stock_quantity
+        ) {
+            existing.quantity++;
+        }
+    } else {
+        cart.value.push({
+            product,
+            quantity: 1,
+        });
+    }
+}
+
+/**
+ * Increment quantity in cart
+ */
+function increment(item: CartItem) {
+    if (
+        !item.product.track_stock ||
+        item.quantity < item.product.stock_quantity
+    ) {
+        item.quantity++;
+    }
+}
+
+/**
+ * Decrement quantity in cart
+ */
+function decrement(item: CartItem) {
+    if (item.quantity > 1) {
+        item.quantity--;
+    } else {
+        remove(item);
+    }
+}
+
+/**
+ * Remove item from cart
+ */
+function remove(item: CartItem) {
+    const index = cart.value.indexOf(item);
+    if (index > -1) cart.value.splice(index, 1);
+}
+
+/**
+ * Compute total for a cart item
+ */
+function itemTotal(item: CartItem) {
+  return (item.product.sale_price ?? item.product.retail_price) * item.quantity;
+}
 </script>
 
 <template>
@@ -113,7 +176,10 @@ function formatLabel(label: string) {
                     role="list"
                 >
                     <li v-for="product in products.data" :key="product.id">
-                        <ProductCard :product="product" />
+                        <ProductCard
+                            :product="product"
+                            @click="addToCart(product)"
+                        />
                     </li>
                 </ul>
 
@@ -183,33 +249,58 @@ function formatLabel(label: string) {
                 </div>
 
                 <!-- cart item -->
-                <div class="cart-item">
-                    <div class="cart-item-thumb">☕</div>
+                <div
+                    v-for="item in cart"
+                    :key="item.product.id"
+                    class="cart-item"
+                >
+                    <img
+                        :src="item.product.product_image_url"
+                        class="cart-item-thumb"
+                    />
                     <div class="cart-item-info">
-                        <div class="cart-item-name">Arabica Blend 250g</div>
+                        <div class="cart-item-name">
+                            {{ item.product.product_name }}
+                        </div>
                         <div class="cart-item-meta">
-                            <span class="unit-price">PKR 12.99</span> / unit ·
-                            BEV-0042
+                            <span class="unit-price"
+                                >PKR
+                                {{
+                                    item.product.sale_price ??
+                                    item.product.retail_price
+                                }}</span
+                            >
+                            ·
+                            {{ item.product.sku }}
                         </div>
                     </div>
                     <div class="cart-item-controls">
                         <div class="qty-control">
-                            <button class="qty-btn minus">
+                            <button
+                                class="qty-btn minus"
+                                @click="decrement(item)"
+                            >
                                 <Minus />
                             </button>
                             <input
+                                v-model.number="item.quantity"
                                 type="number"
                                 class="qty-value"
-                                min="0"
+                                min="1"
+                                :max="
+                                    item.product.track_stock
+                                        ? item.product.stock_quantity
+                                        : undefined
+                                "
                                 step="1"
                             />
-                            <button class="qty-btn">
-                                <Plus />
+                            <button class="qty-btn" @click="increment(item)">
+                                <Plus  />
                             </button>
                         </div>
-                        <div class="cart-item-total">$12.99</div>
+                        <div class="cart-item-total">PKR {{ itemTotal(item).toFixed(2) }}</div>
                     </div>
-                    <button class="item-delete">
+                    <button class="item-delete" @click="remove(item)">
                         <X />
                     </button>
                 </div>

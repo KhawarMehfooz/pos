@@ -46,3 +46,8 @@ export interface Customer {
   customer_phone?: string | null
   customer_email?: string | null
 }
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
