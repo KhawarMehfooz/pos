@@ -27,7 +27,7 @@ Route::get('pos',function(){
                                     'children' => fn ($query) => $query->active()
                                 ]
                             )->get(),
-        'products' => Product::availableForSale()->get(),
+        'products' => Product::availableForSale()->paginate(21),
         'customers' => Customer::orderBy('customer_name')->limit(10)->get()
     ]);
 })->middleware(['auth'])->name('pos');

@@ -2,6 +2,21 @@ export * from './auth';
 export * from './navigation';
 export * from './ui';
 
+export interface PaginationLink {
+  url: string | null,
+  label: string,
+  active: boolean
+}
+
+export interface Paginated<T> {
+  data: T[],
+  current_page: number,
+  last_page: number,
+  per_page: number,
+  total: number,
+  links: PaginationLink[]
+}
+
 export interface Category {
   id: number
   category_name: string
@@ -16,7 +31,8 @@ export interface Product {
   purchase_price: number
   retail_price: number
   sale_price: number | null
-  product_image?: string | null
+  product_image?: string | null,
+  product_image_url?: string,
   barcode?: string | null
   sku?: string | null
   track_stock: boolean

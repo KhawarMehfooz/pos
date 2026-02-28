@@ -225,7 +225,6 @@
         background: var(--primary-50);
         color: var(--primary-700);
         border: 1px dashed var(--primary-200);
-
     }
     .nav-btn.danger:hover {
         background: var(--accent-50);
@@ -486,10 +485,13 @@
 
     /* Product card */
     .product-card {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
         background: var(--surface-card);
-        border-radius: 12px;
-        border: 1px solid var(--border-subtle);
-        box-shadow: var(--shadow-card);
+        border-radius: 6px;
+        border: 2px dotted var(--border-subtle);
+        /* box-shadow: var(--shadow-card); */
         padding: 0.9rem;
         cursor: pointer;
         transition: all 0.12s;
@@ -505,20 +507,34 @@
     .product-thumb {
         width: 100%;
         aspect-ratio: 1;
-        border-radius: 8px;
+        border-radius: 6px;
         background: var(--primary-50);
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 2rem;
         margin-bottom: 0.7rem;
-        border: 1px solid var(--primary-100);
+    }
+
+    .product-thumb img {
+        border: 2px dotted var(--border-subtle);
+        aspect-ratio: 1;
+        border-radius: 6px;
+        object-fit: cover;
+    }
+    .product-card:hover .product-thumb img {
+        border-color: var(--primary-100);
     }
     .product-name {
         font-size: 0.85rem;
         font-weight: 600;
         color: var(--text-primary);
         margin-bottom: 0.15rem;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 2; /* max lines */
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
     .product-sku {
         font-family: 'DM Mono', monospace;
@@ -529,13 +545,18 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-top: 0.5rem;
+        margin-top: auto;
     }
     .product-price {
         font-family: 'DM Mono', monospace;
         font-size: 1rem;
         font-weight: 700;
         color: var(--primary-700);
+    }
+
+    .price-old {
+        font-size: 0.8rem;
+        font-weight: 600;
     }
     .stock-dot {
         width: 7px;
