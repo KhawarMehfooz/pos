@@ -152,9 +152,23 @@
         background: var(--surface-base);
         color: var(--text-primary);
         -webkit-font-smoothing: antialiased;
+    }
+
+    html,
+    body {
         height: 100%;
-        overflow: hidden;
-        
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #app {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
     }
 
     .no-scrollbar::-webkit-scrollbar {
@@ -359,6 +373,35 @@
         padding: 0.5rem;
         scrollbar-width: thin;
         scrollbar-color: hsl(var(--border)) transparent;
+    }
+    .pagination-btn {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px dashed hsl(var(--border));
+        background: transparent;
+        color: hsl(var(--muted-fg));
+        cursor: pointer;
+    }
+
+    .pagination-btn + .pagination-btn {
+        border-left: 0;
+    }
+
+    .pagination-btn:first-of-type {
+        border-top-left-radius: 0.5rem;
+        border-bottom-left-radius: 0.5rem;
+    }
+
+    .pagination-btn:last-of-type {
+        border-top-right-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+
+    .pagination-btn.is-active {
+        background-color: hsl(var(--primary));
+        border-color: hsl(var(--primary));
+        color: hsl(var(--primary-foreground));
     }
 
     /* Cart Panel */
@@ -1316,8 +1359,14 @@
     }
 
     /* scroll bar */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: hsl(var(--border)); border-radius: 99px; }
-
+    ::-webkit-scrollbar {
+        width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: hsl(var(--border));
+        border-radius: 99px;
+    }
 }
