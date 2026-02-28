@@ -4,6 +4,21 @@ import Header from '@/components/Pos/Header.vue';
 import ProductCard from '@/components/Pos/ProductCard.vue';
 import type { Paginated, Product } from '@/types';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
+import {
+    Banknote,
+    Barcode,
+    Check,
+    Minus,
+    Pause,
+    Plus,
+    ShoppingBag,
+    ShoppingCart,
+    Tag,
+    Tally4,
+    Trash,
+    UserRound,
+    X,
+} from 'lucide-vue-next';
 
 const page = usePage<{
     products: Paginated<Product>;
@@ -41,46 +56,15 @@ const products = page.props.products;
                 <button
                     class="toolbar-btn"
                     id="barcodeBtn"
-                    onclick="toggleBarcode()"
                 >
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <rect x="3" y="5" width="2" height="14" />
-                        <rect x="7" y="5" width="1" height="14" />
-                        <rect x="10" y="5" width="2" height="14" />
-                        <rect x="14" y="5" width="1" height="14" />
-                        <rect x="17" y="5" width="2" height="14" />
-                        <rect x="21" y="5" width="1" height="14" />
-                    </svg>
+                    <Barcode />
                     Barcode
-                </button>
-                <button class="toolbar-btn">
-                    <svg
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    >
-                        <line x1="8" y1="6" x2="21" y2="6" />
-                        <line x1="8" y1="12" x2="21" y2="12" />
-                        <line x1="8" y1="18" x2="21" y2="18" />
-                        <line x1="3" y1="6" x2="3.01" y2="6" />
-                        <line x1="3" y1="12" x2="3.01" y2="12" />
-                        <line x1="3" y1="18" x2="3.01" y2="18" />
-                    </svg>
-                    Filter
                 </button>
             </div>
 
             <CategoryTabs />
 
-            <section
-                class=""
-            >
+            <section class="">
                 <!-- Products -->
                 <div class="product-grid-wrap">
                     <ul
@@ -92,12 +76,225 @@ const products = page.props.products;
                         </li>
                     </ul>
                 </div>
-
-                <!-- Cart -->
-                <aside class="cart-panel">
-                    <!-- cart goes here -->
-                </aside>
             </section>
         </div>
+
+        <!-- Cart -->
+        <aside class="cart-panel">
+            <div class="cart-header">
+                <div class="cart-header-row">
+                    <div class="cart-title">
+                        Cart
+                        <span class="cart-count" id="cartCount">0</span>
+                    </div>
+                    <div class="cart-actions">
+                        <button class="icon-btn btn-hold" title="Hold order">
+                            <Pause />
+                        </button>
+                        <button class="icon-btn btn-clear" title="Clear cart">
+                            <Trash />
+                        </button>
+                    </div>
+                </div>
+
+                <div class="customer-selector">
+                    <UserRound />
+                    <select
+                        class="w-full cursor-pointer border-none outline-none focus:border-none focus:ring-0 focus:outline-none"
+                    >
+                        <option>Walk-in Customer</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- cart items -->
+            <div class="cart-items" id="cartItems">
+                <!-- cart empty -->
+                <div class="cart-empty" id="cartEmpty" style="display: none">
+                    <div class="cart-empty-icon">
+                        <ShoppingCart />
+                    </div>
+
+                    <p>
+                        <strong>Cart is empty</strong><br />Click a product or
+                        scan a barcode to add items
+                    </p>
+                </div>
+
+                <!-- cart item -->
+                <div class="cart-item">
+                    <div class="cart-item-thumb">☕</div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">Arabica Blend 250g</div>
+                        <div class="cart-item-meta">
+                            <span class="unit-price">PKR 12.99</span> / unit ·
+                            BEV-0042
+                        </div>
+                    </div>
+                    <div class="cart-item-controls">
+                        <div class="qty-control">
+                            <button class="qty-btn minus">
+                                <Minus />
+                            </button>
+                            <input
+                                type="number"
+                                class="qty-value"
+                                min="0"
+                                step="1"
+                            />
+                            <button class="qty-btn">
+                                <Plus />
+                            </button>
+                        </div>
+                        <div class="cart-item-total">$12.99</div>
+                    </div>
+                    <button class="item-delete">
+                        <X />
+                    </button>
+                </div>
+
+                <div class="cart-item">
+                    <div class="cart-item-thumb">☕</div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">Arabica Blend 250g</div>
+                        <div class="cart-item-meta">
+                            <span class="unit-price">PKR 12.99</span> / unit ·
+                            BEV-0042
+                        </div>
+                    </div>
+                    <div class="cart-item-controls">
+                        <div class="qty-control">
+                            <button class="qty-btn minus">
+                                <Minus />
+                            </button>
+                            <input
+                                type="number"
+                                class="qty-value"
+                                min="0"
+                                step="1"
+                            />
+                            <button class="qty-btn">
+                                <Plus />
+                            </button>
+                        </div>
+                        <div class="cart-item-total">$12.99</div>
+                    </div>
+                    <button class="item-delete">
+                        <X />
+                    </button>
+                </div>
+
+                <div class="cart-item">
+                    <div class="cart-item-thumb">☕</div>
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">Arabica Blend 250g</div>
+                        <div class="cart-item-meta">
+                            <span class="unit-price">PKR 12.99</span> / unit ·
+                            BEV-0042
+                        </div>
+                    </div>
+                    <div class="cart-item-controls">
+                        <div class="qty-control">
+                            <button class="qty-btn minus">
+                                <Minus />
+                            </button>
+                            <input
+                                type="number"
+                                class="qty-value"
+                                min="0"
+                                step="1"
+                            />
+                            <button class="qty-btn">
+                                <Plus />
+                            </button>
+                        </div>
+                        <div class="cart-item-total">$12.99</div>
+                    </div>
+                    <button class="item-delete">
+                        <X />
+                    </button>
+                </div>
+            </div>
+
+            <!-- order summary -->
+            <div class="cart-summary" id="cartSummary" style="display: block">
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal</span>
+                    <span class="summary-value" id="subtotalVal">$70.80</span>
+                </div>
+                <div class="summary-row" id="discountRow" style="display: none">
+                    <span class="summary-label"
+                        >Discount <span id="discountLabel"></span
+                    ></span>
+                    <span class="summary-value discount" id="discountVal"
+                        >−$0.00</span
+                    >
+                </div>
+
+                <div class="summary-row" id="discountRow" style="display: flex">
+                    <span class="summary-label"
+                        >Discount
+                        <span id="discountLabel">(10%)</span></span
+                    >
+                    <span class="summary-value discount" id="discountVal"
+                        >−$7.08</span
+                    >
+                </div>
+
+                <div class="summary-row">
+                    <span class="summary-label">Tax (8%)</span>
+                    <span class="summary-value" id="taxVal">$5.66</span>
+                </div>
+
+                <hr class="summary-divider" />
+
+                <div class="summary-total-row">
+                    <span class="summary-total-label">Total Due</span>
+                    <span class="summary-total-value" id="totalVal"
+                        >$76.46</span
+                    >
+                </div>
+
+                <!-- Discount -->
+                <div class="discount-row">
+                    <div class="discount-input-wrap">
+                        <input
+                            class="discount-input"
+                            type="text"
+                            id="discountInput"
+                            placeholder="Discount Amount"
+                        />
+                    </div>
+                    <button class="apply-btn">
+                        Apply
+                    </button>
+                </div>
+                <div
+                    id="discountTag"
+                    style=" margin-bottom: 0.5rem"
+                >
+                    <span class="discount-tag">
+                        <Tag :size="14" /> <span id="discountTagLabel">10% Discount Applied</span>
+                        <button title="Remove Discount" > <X :size="16" /></button>
+                    </span>
+                </div>
+
+                <!-- Charge button -->
+                <button class="charge-btn">
+                    <Check :size="18" />
+                    <span>
+                        Charge <span id="chargeTotalBtn">$76.46</span>
+                        <div class="charge-btn-sub">Tap to enter payment</div>
+                    </span>
+                </button>
+
+                <div class="sub-actions">
+                    <button class="sub-btn">
+                        <Pause :size="12" />
+                        Hold
+                    </button>
+                </div>
+            </div>
+        </aside>
     </div>
 </template>
