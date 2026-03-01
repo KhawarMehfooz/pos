@@ -781,6 +781,17 @@
     .apply-btn:hover {
         background: hsl(38 92% 42%);
     }
+
+    .apply-btn:disabled {
+        background: hsl(var(--primary) / 0.45);
+        color: hsl(var(--primary-fg) / 0.6);
+        cursor: not-allowed;
+    }
+
+    .apply-btn:disabled:hover {
+        background: hsl(var(--primary) / 0.45);
+    }
+
     .discount-tag {
         display: flex;
         align-items: center;
@@ -824,6 +835,20 @@
         gap: 0.5rem;
         letter-spacing: 0.01em;
     }
+    .charge-btn:disabled {
+        background: hsl(var(--primary) / 0.45);
+        color: hsl(var(--primary-fg) / 0.6);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+        filter: saturate(0.85);
+    }
+    .charge-btn:disabled:hover,
+    .charge-btn:disabled:active {
+        background: hsl(var(--primary) / 0.45);
+        transform: none;
+    }
+
     .charge-btn:hover {
         background: hsl(38 92% 44%);
     }
@@ -858,6 +883,12 @@
         align-items: center;
         justify-content: center;
         gap: 0.35rem;
+    }
+
+    .sub-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        border-style: solid;
     }
     .sub-btn:hover {
         border-color: hsl(var(--primary) / 0.5);

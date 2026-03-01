@@ -14,11 +14,11 @@ import {
     UserRound,
     X,
 } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 import Header from '@/components/Pos/Header.vue';
 import ProductCard from '@/components/Pos/ProductCard.vue';
-import { CartItem, type Category, type Paginated, type Product } from '@/types';
+import type { CartItem, Category, Paginated, Product } from '@/types';
 
 const props = defineProps<{
     products: Paginated<Product>;
@@ -28,6 +28,8 @@ const props = defineProps<{
 
 const searchTerm = ref('');
 const activeCategoryId = ref(props.activeCategoryId ?? 0);
+const discountInput = ref('');
+const discountAmount = ref<number | null>(null);
 
 function filterByCategory(categoryId: number) {
     activeCategoryId.value = categoryId;
@@ -76,7 +78,6 @@ function formatLabel(label: string) {
     return label;
 }
 
-const cartItems = ref<Product[]>([]);
 const cart = ref<CartItem[]>([]);
 
 /**
@@ -136,8 +137,89 @@ function remove(item: CartItem) {
  * Compute total for a cart item
  */
 function itemTotal(item: CartItem) {
-  return (item.product.sale_price ?? item.product.retail_price) * item.quantity;
+    return (
+        (item.product.sale_price ?? item.product.retail_price) * item.quantity
+    );
 }
+
+/**
+ * Calculate subtotal
+ */
+
+const subtotal = computed(() => {
+    return cart.value.reduce((sum, item) => {
+        return sum + itemTotal(item);
+    }, 0);
+});
+
+/**
+ * Final discount applied to the cart.
+ * Clamped so it never exceeds the subtotal.
+ */
+const appliedDiscount = computed(() => {
+    if (!discountAmount.value) return 0;
+
+    // discount should not be greater than subtotal
+    return Math.min(discountAmount.value, subtotal.value);
+});
+
+/**
+ * Total amount due after discount.
+ */
+const totalDue = computed(() => {
+    return Math.max(subtotal.value - appliedDiscount.value, 0);
+});
+
+/**
+ * Whether the cart currently has items.
+ */
+const hasCartItems = computed(() => cart.value.length > 0);
+
+/**
+ * Determines if a discount can be applied.
+ * Requires cart items and a valid discount value.
+ */
+const canApplyDiscount = computed(() => {
+    return hasCartItems.value && Number(discountInput.value) > 0;
+});
+
+/**
+ * Apply a fixed discount amount to the cart.
+ * Ignores invalid values and empty carts.
+ */
+function applyDiscount() {
+    if (!hasCartItems.value) return;
+
+    const value = Math.floor(Number(discountInput.value));
+    if (value <= 0) return;
+
+    discountAmount.value = Math.min(value, subtotal.value);
+    discountInput.value = '';
+}
+
+/**
+ * Remove the currently applied discount.
+ */
+function removeDiscount() {
+    discountAmount.value = null;
+}
+
+/**
+ * Clear discount when cart becomes empty.
+ *
+ * This watcher ensures discounts are not kept when there
+ * are no items in the cart.
+ */
+watch(
+    cart,
+    () => {
+        if (cart.value.length === 0) {
+            discountAmount.value = null;
+            discountInput.value = '';
+        }
+    },
+    { deep: true },
+);
 </script>
 
 <template>
@@ -295,10 +377,12 @@ function itemTotal(item: CartItem) {
                                 step="1"
                             />
                             <button class="qty-btn" @click="increment(item)">
-                                <Plus  />
+                                <Plus />
                             </button>
                         </div>
-                        <div class="cart-item-total">PKR {{ itemTotal(item).toFixed(2) }}</div>
+                        <div class="cart-item-total">
+                            PKR {{ itemTotal(item).toFixed(2) }}
+                        </div>
                     </div>
                     <button class="item-delete" @click="remove(item)">
                         <X />
@@ -310,29 +394,19 @@ function itemTotal(item: CartItem) {
             <div class="cart-summary" id="cartSummary" style="display: block">
                 <div class="summary-row">
                     <span class="summary-label">Subtotal</span>
-                    <span class="summary-value" id="subtotalVal">$70.80</span>
+                    <span class="summary-value" id="subtotalVal"
+                        >PKR {{ subtotal.toFixed(2) }}</span
+                    >
                 </div>
-                <div class="summary-row" id="discountRow" style="display: none">
-                    <span class="summary-label"
-                        >Discount <span id="discountLabel"></span
-                    ></span>
+                <div
+                    v-if="appliedDiscount > 0"
+                    class="summary-row"
+                    id="discountRow"
+                >
+                    <span class="summary-label">Discount </span>
                     <span class="summary-value discount" id="discountVal"
-                        >−$0.00</span
+                        >PKR {{ appliedDiscount.toFixed(2) }}</span
                     >
-                </div>
-
-                <div class="summary-row" id="discountRow" style="display: flex">
-                    <span class="summary-label"
-                        >Discount <span id="discountLabel">(10%)</span></span
-                    >
-                    <span class="summary-value discount" id="discountVal"
-                        >−$7.08</span
-                    >
-                </div>
-
-                <div class="summary-row">
-                    <span class="summary-label">Tax (8%)</span>
-                    <span class="summary-value" id="taxVal">$5.66</span>
                 </div>
 
                 <hr class="summary-divider" />
@@ -340,43 +414,67 @@ function itemTotal(item: CartItem) {
                 <div class="summary-total-row">
                     <span class="summary-total-label">Total Due</span>
                     <span class="summary-total-value" id="totalVal"
-                        >$76.46</span
+                        >PKR {{ totalDue.toFixed(2) }}</span
                     >
                 </div>
 
                 <!-- Discount -->
-                <div class="discount-row">
+                <form
+                    v-if="!discountAmount"
+                    class="discount-row"
+                    @submit.prevent="applyDiscount"
+                >
                     <div class="discount-input-wrap">
                         <input
+                            v-model="discountInput"
                             class="discount-input"
-                            type="text"
-                            id="discountInput"
+                            type="number"
+                            min="0"
+                            :max="subtotal"
+                            step="1"
                             placeholder="Discount Amount"
+                            autocomplete="off"
+                            :disabled="!hasCartItems"
                         />
                     </div>
-                    <button class="apply-btn">Apply</button>
-                </div>
-                <div id="discountTag" style="margin-bottom: 0.5rem">
+
+                    <button
+                        type="submit"
+                        class="apply-btn"
+                        :disabled="!canApplyDiscount"
+                    >
+                        Apply
+                    </button>
+                </form>
+
+                <div v-else id="discountTag" style="margin-bottom: 0.5rem">
                     <span class="discount-tag">
                         <Tag :size="14" />
-                        <span id="discountTagLabel">10% Discount Applied</span>
-                        <button title="Remove Discount">
+                        <span id="discountTagLabel"
+                            >PKR {{ appliedDiscount.toFixed(2) }} Discount
+                            Applied</span
+                        >
+                        <button @click="removeDiscount" title="Remove Discount">
                             <X :size="16" />
                         </button>
                     </span>
                 </div>
 
                 <!-- Charge button -->
-                <button class="charge-btn">
+                <button
+                    class="charge-btn"
+                    :disabled="cart.length === 0 || totalDue <= 0"
+                >
                     <Check :size="18" />
                     <span>
-                        Charge <span id="chargeTotalBtn">$76.46</span>
+                        Charge
+                        <span>PKR {{ totalDue.toFixed(2) }}</span>
                         <div class="charge-btn-sub">Tap to enter payment</div>
                     </span>
                 </button>
 
                 <div class="sub-actions">
-                    <button class="sub-btn">
+                    <button class="sub-btn" :disabled="cart.length === 0">
                         <Pause :size="12" />
                         Hold
                     </button>
