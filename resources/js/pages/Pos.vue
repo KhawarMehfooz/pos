@@ -2,12 +2,10 @@
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
 import {
-    Barcode,
     Check,
     Minus,
     Pause,
     Plus,
-    Search,
     ShoppingCart,
     Tag,
     Trash,
@@ -17,8 +15,10 @@ import {
 import { computed, ref, watch } from 'vue';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 import Header from '@/components/Pos/Header.vue';
-import ProductCard from '@/components/Pos/ProductCard.vue';
+import PosToolbar from '@/components/Pos/PosToolbar.vue';
+import ProductGrid from '@/components/Pos/ProductGrid.vue';
 import type { CartItem, Category, Paginated, Product } from '@/types';
+import CartPanel from '@/components/Pos/cart/CartPanel.vue';
 
 const props = defineProps<{
     products: Paginated<Product>;
@@ -57,26 +57,6 @@ function searchProducts() {
 }
 
 const debouncedSearch = debounce(searchProducts, 500);
-
-function goToPage(url: string | null) {
-    if (!url) return;
-
-    router.get(
-        url,
-        {},
-        {
-            preserveScroll: true,
-            preserveState: true,
-            only: ['products'],
-        },
-    );
-}
-
-function formatLabel(label: string) {
-    if (label.includes('Previous')) return 'Prev';
-    if (label.includes('Next')) return 'Next';
-    return label;
-}
 
 const cart = ref<CartItem[]>([]);
 
@@ -131,6 +111,13 @@ function decrement(item: CartItem) {
 function remove(item: CartItem) {
     const index = cart.value.indexOf(item);
     if (index > -1) cart.value.splice(index, 1);
+}
+
+function handleUpdateQuantity(updatedItem: CartItem) {
+    const found = cart.value.find(
+        (i) => i.product.id === updatedItem.product.id,
+    );
+    if (found) found.quantity = updatedItem.quantity;
 }
 
 /**
@@ -228,23 +215,7 @@ watch(
     <div class="pos-layout">
         <div class="product-panel">
             <!-- toolbar -->
-            <div class="panel-toolbar">
-                <div class="search-wrap">
-                    <Search class="search-icon" />
-                    <input
-                        v-model="searchTerm"
-                        @input="debouncedSearch"
-                        class="search-input"
-                        type="text"
-                        placeholder="Search products or scan barcode…"
-                        id="searchInput"
-                    />
-                </div>
-                <button class="toolbar-btn" id="barcodeBtn">
-                    <Barcode />
-                    Barcode
-                </button>
-            </div>
+            <PosToolbar v-model:search="searchTerm" @search="debouncedSearch" />
 
             <CategoryTabs
                 :categories="categories"
@@ -252,44 +223,28 @@ watch(
                 @update:category="filterByCategory"
             />
 
-            <section class="product-grid-wrap">
-                <ul
-                    class="grid grid-cols-[repeat(auto-fill,minmax(140px,1fr))] gap-[0.9rem]"
-                    role="list"
-                >
-                    <li v-for="product in products.data" :key="product.id">
-                        <ProductCard
-                            :product="product"
-                            @click="addToCart(product)"
-                        />
-                    </li>
-                </ul>
-
-                <hr
-                    class="my-4 h-px border-0"
-                    style="background: hsl(var(--border) / 0.6)"
-                />
-                <!-- Pagination -->
-                <div class="flex flex-wrap items-center justify-center">
-                    <button
-                        v-for="link in products.links"
-                        :key="link.label"
-                        :disabled="!link.url"
-                        @click="goToPage(link.url)"
-                        class="pagination-btn"
-                        :class="{
-                            'is-active': link.active,
-                            'cursor-not-allowed opacity-50': !link.url,
-                        }"
-                    >
-                        {{ formatLabel(link.label) }}
-                    </button>
-                </div>
-            </section>
+            <ProductGrid :products="products" @add-to-cart="addToCart" />
         </div>
 
+        <CartPanel
+            :cart="cart"
+            :subtotal="subtotal"
+            :appliedDiscount="appliedDiscount"
+            :totalDue="totalDue"
+            :discountAmount="discountAmount"
+            :discountInput="discountInput"
+            :hasCartItems="hasCartItems"
+            :canApplyDiscount="canApplyDiscount"
+            :applyDiscount="applyDiscount"
+            :removeDiscount="removeDiscount"
+            @increment="increment"
+            @decrement="decrement"
+            @remove="remove"
+            @update-quantity="handleUpdateQuantity"
+        />
+
         <!-- Cart -->
-        <aside class="cart-panel">
+        <aside class="cart-panel" style="display: none">
             <div class="cart-header">
                 <div class="cart-header-row">
                     <div class="cart-title">
@@ -319,7 +274,7 @@ watch(
             <!-- cart items -->
             <div class="cart-items" id="cartItems">
                 <!-- cart empty -->
-                <div class="cart-empty" id="cartEmpty" style="display: none">
+                <div class="cart-empty" id="cartEmpty" v-if="!cart.length">
                     <div class="cart-empty-icon">
                         <ShoppingCart />
                     </div>
