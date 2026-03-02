@@ -13,12 +13,12 @@ import {
     X,
 } from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
+import CartPanel from '@/components/Pos/cart/CartPanel.vue';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 import Header from '@/components/Pos/Header.vue';
 import PosToolbar from '@/components/Pos/PosToolbar.vue';
 import ProductGrid from '@/components/Pos/ProductGrid.vue';
 import type { CartItem, Category, Paginated, Product } from '@/types';
-import CartPanel from '@/components/Pos/cart/CartPanel.vue';
 
 const props = defineProps<{
     products: Paginated<Product>;
@@ -241,6 +241,9 @@ watch(
             @decrement="decrement"
             @remove="remove"
             @update-quantity="handleUpdateQuantity"
+            @update-discount-input="discountInput = $event"
+            @apply-discount="applyDiscount"
+            @remove-discount="removeDiscount"
         />
 
         <!-- Cart -->

@@ -1,11 +1,5 @@
 <script setup lang="ts">
 import { Pause, Trash, UserRound } from 'lucide-vue-next';
-import type { CartItem } from '@/types';
-
-
-const {cart} = defineProps<{
-    cart: CartItem[] 
-}>()
 
 </script>
 <template>
@@ -13,7 +7,6 @@ const {cart} = defineProps<{
         <div class="cart-header-row">
             <div class="cart-title">
                 Cart
-                <span class="cart-count" id="cartCount">{{cart.length}}</span>
             </div>
             <div class="cart-actions">
                 <button class="icon-btn btn-hold" title="Hold order">

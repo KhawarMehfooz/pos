@@ -1,3 +1,25 @@
+<script setup lang="ts">
+import { Check, Pause, Tag, X } from 'lucide-vue-next';
+import type { CartItem } from '@/types';
+
+const {subtotal, appliedDiscount, totalDue, cart, discountInput, hasCartItems, discountAmount, canApplyDiscount} = defineProps<{
+    subtotal: number;
+    appliedDiscount: number;
+    totalDue: number;
+    cart: CartItem[];
+    discountInput: string;
+    hasCartItems: boolean;
+    discountAmount: number | null;
+    canApplyDiscount: boolean;
+}>()
+
+const emit = defineEmits<{
+    (e: 'apply-discount'): void
+    (e: 'remove-discount'): void
+    (e: 'update-discount-input', value: string): void
+}>();
+</script>
+
 <template>
         <!-- order summary -->
         <div class="cart-summary" id="cartSummary" style="display: block">
@@ -31,11 +53,12 @@
             <form
                 v-if="!discountAmount"
                 class="discount-row"
-                @submit.prevent="applyDiscount"
+                @submit.prevent="emit('apply-discount')"
             >
                 <div class="discount-input-wrap">
                     <input
-                        v-model="discountInput"
+                        :value="discountInput"
+                        @input="emit('update-discount-input', ($event.target as HTMLInputElement).value)"
                         class="discount-input"
                         type="number"
                         min="0"
@@ -63,7 +86,7 @@
                         >PKR {{ appliedDiscount.toFixed(2) }} Discount
                         Applied</span
                     >
-                    <button @click="removeDiscount" title="Remove Discount">
+                    <button @click="emit('remove-discount')" title="Remove Discount">
                         <X :size="16" />
                     </button>
                 </span>
