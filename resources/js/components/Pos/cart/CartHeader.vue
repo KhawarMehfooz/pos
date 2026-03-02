@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Pause, Trash, UserRound } from 'lucide-vue-next';
-
+const emit = defineEmits<{
+    (e: 'clear-cart'): void
+}>()
 </script>
 <template>
     <div class="cart-header">
@@ -12,7 +14,7 @@ import { Pause, Trash, UserRound } from 'lucide-vue-next';
                 <button class="icon-btn btn-hold" title="Hold order">
                     <Pause />
                 </button>
-                <button class="icon-btn btn-clear" title="Clear cart">
+                <button class="icon-btn btn-clear" title="Clear cart" @click="emit('clear-cart')">
                     <Trash />
                 </button>
             </div>

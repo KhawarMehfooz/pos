@@ -24,13 +24,14 @@ const emit = defineEmits<{
     (e: 'remove-discount'): void;
     (e: 'update-quantity', item: CartItemType): void;
     (e: 'update-discount-input', value: string): void
+    (e: 'clear-cart'): void;
 }>();
 </script>
 
 <template>
     <aside class="cart-panel">
         <!-- Cart Header -->
-        <CartHeader :cart="cart" />
+        <CartHeader @clear-cart="emit('clear-cart')"  />
 
         <!-- Cart Items -->
         <div class="cart-items">
