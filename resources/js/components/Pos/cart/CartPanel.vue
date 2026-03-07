@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ShoppingCart } from 'lucide-vue-next';
-import type { CartItem as CartItemType } from '@/types';
+import type { CartItem as CartItemType, Customer } from '@/types';
 import CartHeader from './CartHeader.vue';
 import CartItem from './CartItem.vue';
 import CartSummary from './CartSummary.vue';
@@ -14,6 +14,9 @@ const { cart } = defineProps<{
     discountInput: string;
     hasCartItems: boolean;
     canApplyDiscount: boolean;
+    customers: Customer[];
+    customerSearch: string;
+    selectedCustomer: Customer | null;
 }>();
 
 const emit = defineEmits<{
@@ -23,7 +26,10 @@ const emit = defineEmits<{
     (e: 'apply-discount'): void;
     (e: 'remove-discount'): void;
     (e: 'update-quantity', item: CartItemType): void;
-    (e: 'update-discount-input', value: string): void
+    (e: 'update-discount-input', value: string): void;
+    (e: 'update-customer-search', value: string): void;
+    (e: 'select-customer', customer: Customer): void;
+    (e: 'search-customer'): void;
     (e: 'clear-cart'): void;
 }>();
 </script>
@@ -31,7 +37,15 @@ const emit = defineEmits<{
 <template>
     <aside class="cart-panel">
         <!-- Cart Header -->
-        <CartHeader @clear-cart="emit('clear-cart')"  />
+        <CartHeader
+            :customers="customers"
+            :search="customerSearch"
+            :selected-customer="selectedCustomer"
+            @update:search="emit('update-customer-search', $event)"
+            @select-customer="emit('select-customer', $event)"
+            @clear-cart="emit('clear-cart')"
+            @search-customer = "emit('search-customer')"
+        />
 
         <!-- Cart Items -->
         <div class="cart-items">

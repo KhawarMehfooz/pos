@@ -1,35 +1,44 @@
 <script setup lang="ts">
 import { router } from '@inertiajs/vue3';
 import { debounce } from 'lodash';
-import {
-    Check,
-    Minus,
-    Pause,
-    Plus,
-    ShoppingCart,
-    Tag,
-    Trash,
-    UserRound,
-    X,
-} from 'lucide-vue-next';
 import { computed, ref, watch } from 'vue';
 import CartPanel from '@/components/Pos/cart/CartPanel.vue';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 import Header from '@/components/Pos/Header.vue';
 import PosToolbar from '@/components/Pos/PosToolbar.vue';
 import ProductGrid from '@/components/Pos/ProductGrid.vue';
-import type { CartItem, Category, Paginated, Product } from '@/types';
+import type { CartItem, Category, Customer, Paginated, Product } from '@/types';
 
 const props = defineProps<{
     products: Paginated<Product>;
     categories: Category[];
     activeCategoryId?: number;
+    customers: Customer[]
 }>();
 
 const searchTerm = ref('');
 const activeCategoryId = ref(props.activeCategoryId ?? 0);
 const discountInput = ref('');
 const discountAmount = ref<number | null>(null);
+const customerSearch = ref('');
+const selectedCustomer = ref<Customer | null>(null);
+const allCustomers = computed(() => props.customers);
+
+function searchCustomers(customerSearch: string) {
+  router.get(
+    '/pos',
+    {
+      category: activeCategoryId.value, 
+      search: searchTerm.value,         
+      customer_search: customerSearch,  
+    },
+    {
+      preserveScroll: true,
+      preserveState: true,
+      only: ['customers', 'filters'],
+    }
+  );
+}
 
 function filterByCategory(categoryId: number) {
     activeCategoryId.value = categoryId;
@@ -57,6 +66,7 @@ function searchProducts() {
 }
 
 const debouncedSearch = debounce(searchProducts, 500);
+const debouncedCustomerSearch = debounce(searchCustomers, 500);
 
 const cart = ref<CartItem[]>([]);
 
@@ -252,6 +262,13 @@ watch(
             @apply-discount="applyDiscount"
             @remove-discount="removeDiscount"
             @clear-cart="clearCart"
+
+            :customers="customers"
+            :customer-search="customerSearch"
+            :selected-customer="selectedCustomer"
+            @update-customer-search="customerSearch = $event"
+            @select-customer = "selectedCustomer = $event"
+            @search-customer = "debouncedCustomerSearch(customerSearch)"
         />
     </div>
 </template>

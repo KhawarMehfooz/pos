@@ -422,7 +422,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 0.6rem;
+        margin-bottom: 0.85rem;
     }
     .cart-title {
         font-family: 'Sora', sans-serif;

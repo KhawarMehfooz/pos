@@ -14,4 +14,10 @@ class Customer extends Model
         'customer_phone',
         'customer_email'
     ];
+
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+        'deleted_at'
+    ];
 }

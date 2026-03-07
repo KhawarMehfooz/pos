@@ -38,10 +38,23 @@ Route::get('pos', function (Request $request) {
         ->orderBy('category_name')
         ->get();
 
+    $customerSearch = $request->input('customer_search');
+
+    $customers = Customer::query()
+        ->when(
+            $customerSearch,
+            fn($q) =>
+            $q->where('customer_name', 'like', "%{$customerSearch}%")
+                ->orWhere('phone', 'like', "%{$customerSearch}%")
+        )
+        ->orderBy('customer_name')
+        ->limit(5)
+        ->get();
+
     return Inertia::render('Pos', [
         'categories' => $categories,
         'products' => $products,
-        'customers' => Customer::orderBy('customer_name')->limit(10)->get()
+        'customers' => $customers
     ]);
 })->middleware(['auth'])->name('pos');
 
