@@ -5,15 +5,23 @@ import { computed, ref, watch } from 'vue';
 import CartPanel from '@/components/Pos/cart/CartPanel.vue';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 import Header from '@/components/Pos/Header.vue';
+import NumPad from '@/components/Pos/NumPad.vue';
 import PosToolbar from '@/components/Pos/PosToolbar.vue';
 import ProductGrid from '@/components/Pos/ProductGrid.vue';
-import type { CartItem, Category, Customer, Paginated, Product } from '@/types';
+import type {
+    CartItem,
+    Category,
+    Customer,
+    Paginated,
+    Product,
+    TransactionItem,
+} from '@/types';
 
 const props = defineProps<{
     products: Paginated<Product>;
     categories: Category[];
     activeCategoryId?: number;
-    customers: Customer[]
+    customers: Customer[];
 }>();
 
 const searchTerm = ref('');
@@ -22,22 +30,25 @@ const discountInput = ref('');
 const discountAmount = ref<number | null>(null);
 const customerSearch = ref('');
 const selectedCustomer = ref<Customer | null>(null);
-const allCustomers = computed(() => props.customers);
+
+const emit = defineEmits<{
+    (e: 'charge-payment'): void;
+}>();
 
 function searchCustomers(customerSearch: string) {
-  router.get(
-    '/pos',
-    {
-      category: activeCategoryId.value, 
-      search: searchTerm.value,         
-      customer_search: customerSearch,  
-    },
-    {
-      preserveScroll: true,
-      preserveState: true,
-      only: ['customers', 'filters'],
-    }
-  );
+    router.get(
+        '/pos',
+        {
+            category: activeCategoryId.value,
+            search: searchTerm.value,
+            customer_search: customerSearch,
+        },
+        {
+            preserveScroll: true,
+            preserveState: true,
+            only: ['customers', 'filters'],
+        },
+    );
 }
 
 function filterByCategory(categoryId: number) {
@@ -69,6 +80,16 @@ const debouncedSearch = debounce(searchProducts, 500);
 const debouncedCustomerSearch = debounce(searchCustomers, 500);
 
 const cart = ref<CartItem[]>([]);
+
+const isNumpadOpen = ref(false);
+
+function openNumpad() {
+    isNumpadOpen.value = true;
+}
+
+function closeNumpad() {
+    isNumpadOpen.value = false;
+}
 
 /**
  * Add product to cart
@@ -201,11 +222,54 @@ function removeDiscount() {
     discountAmount.value = null;
 }
 
-function clearCart(){
+function clearCart() {
     cart.value = [];
 
     discountAmount.value = null;
     discountInput.value = '';
+}
+
+function processTransaction(status: 'hold' | 'completed', paidAmount = 0) {
+    if (!hasCartItems.value) return alert('Cart is empty');
+
+    const payload = {
+        customer_id: selectedCustomer.value?.id || null,
+        discount: discountAmount.value || 0,
+        status,
+        paid_amount: paidAmount,
+        items: cart.value.map((item): TransactionItem => {
+            const product = item.product;
+            const price = product.sale_price ?? product.retail_price;
+
+            return {
+                product_id: product.id,
+                product_name: product.product_name,
+                product_price: price,
+                quantity: item.quantity,
+                total: price * item.quantity,
+                sku: product.sku ?? null,
+                barcode: product.barcode ?? null,
+                product_image: product.product_image_url ?? null,
+            };
+        }),
+    };
+
+    router.post('/transactions', payload, {
+        onSuccess: () => {
+            alert(
+                `Transaction ${status === 'completed' ? 'completed' : 'held'} successfully!`,
+            );
+            clearCart();
+            selectedCustomer.value = null;
+            customerSearch.value = '';
+            discountAmount.value = null;
+            discountInput.value = '';
+        },
+        onError: (errors) => {
+            console.error(errors);
+            alert('Failed to create transaction.');
+        },
+    });
 }
 
 /**
@@ -262,13 +326,20 @@ watch(
             @apply-discount="applyDiscount"
             @remove-discount="removeDiscount"
             @clear-cart="clearCart"
-
             :customers="customers"
             :customer-search="customerSearch"
             :selected-customer="selectedCustomer"
             @update-customer-search="customerSearch = $event"
-            @select-customer = "selectedCustomer = $event"
-            @search-customer = "debouncedCustomerSearch(customerSearch)"
+            @select-customer="selectedCustomer = $event"
+            @search-customer="debouncedCustomerSearch(customerSearch)"
+            @charge-payment="openNumpad"
         />
     </div>
+
+    <NumPad
+        :total-due="totalDue" 
+        :open="isNumpadOpen" 
+        @close="closeNumpad" 
+        @process-transaction="processTransaction" 
+    />
 </template>

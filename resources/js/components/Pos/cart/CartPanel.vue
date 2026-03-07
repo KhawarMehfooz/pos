@@ -31,6 +31,7 @@ const emit = defineEmits<{
     (e: 'select-customer', customer: Customer): void;
     (e: 'search-customer'): void;
     (e: 'clear-cart'): void;
+    (e: 'charge-payment'): void;
 }>();
 </script>
 
@@ -87,6 +88,7 @@ const emit = defineEmits<{
             @apply-discount="emit('apply-discount')"
             @remove-discount="emit('remove-discount')"
             @update-discount-input="emit('update-discount-input', $event)"
+            @charge-payment="emit('charge-payment')"
         />
     </aside>
 </template>

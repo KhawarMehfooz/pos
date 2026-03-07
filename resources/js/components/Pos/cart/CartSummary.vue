@@ -17,6 +17,7 @@ const emit = defineEmits<{
     (e: 'apply-discount'): void
     (e: 'remove-discount'): void
     (e: 'update-discount-input', value: string): void
+    (e: 'charge-payment'): void
 }>();
 </script>
 
@@ -96,6 +97,7 @@ const emit = defineEmits<{
             <button
                 class="charge-btn"
                 :disabled="cart.length === 0 || totalDue <= 0"
+                @click="emit('charge-payment')"
             >
                 <Check :size="18" />
                 <span>

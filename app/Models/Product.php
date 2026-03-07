@@ -49,8 +49,10 @@ class Product extends Model
     public function scopeAvailableForSale($query)
     {
         return $query->where('is_active', true)
-            ->whereHas('category', function ($q) {
-                $q->where('is_active', true);
+            ->whereHas('category', fn($q) => $q->where('is_active', true))
+            ->where(function ($q) {
+                $q->where('track_stock', false)
+                    ->orWhere('stock_quantity', '>', 0);
             });
     }
 
@@ -58,8 +60,9 @@ class Product extends Model
         'product_image_url'
     ];
 
-    public function getProductImageUrlAttribute(){
-        if(!$this->product_image){
+    public function getProductImageUrlAttribute()
+    {
+        if (!$this->product_image) {
             return asset('images/product-placeholder.jpeg');
         }
         return Storage::disk('public')->url($this->product_image);

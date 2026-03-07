@@ -1,6 +1,7 @@
 <?php
 
 use App\Filament\Resources\Products\ProductResource;
+use App\Http\Controllers\TransactionController;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Product;
@@ -57,5 +58,7 @@ Route::get('pos', function (Request $request) {
         'customers' => $customers
     ]);
 })->middleware(['auth'])->name('pos');
+
+Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store')->middleware(['auth']);
 
 require __DIR__ . '/settings.php';

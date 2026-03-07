@@ -896,6 +896,117 @@
         color: hsl(var(--accent-fg));
     }
 
+    /* Num Pad */
+    .numpad-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        background: rgba(28, 25, 23, 0.5);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+    }
+    .numpad-overlay.open {
+        display: flex;
+    }
+    .numpad-modal {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: var(--shadow-lg);
+        width: 480px;
+    }
+    .numpad-display {
+        background: hsl(var(--muted));
+        border-radius: var(--border-radius);
+        border: 1px dashed hsl(var(--border));
+        padding: 0.85rem 1rem;
+        text-align: right;
+        margin-bottom: 1rem;
+    }
+    .numpad-label {
+        font-size: 0.7rem;
+        color: hsl(var(--muted-fg));
+        margin-bottom: 0.15rem;
+    }
+    .numpad-value {
+        font-family: 'DM Mono', monospace;
+        font-size: 2rem;
+        font-weight: 700;
+        color: hsl(var(--foreground));
+    }
+    .numpad-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+    .numpad-key {
+        padding: 0.9rem;
+        border-radius: var(--border-radius);
+        border: 1px dashed hsl(var(--border));
+        background: hsl(var(--muted));
+        font-family: 'DM Mono', monospace;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.1s;
+        color: hsl(var(--foreground));
+    }
+    .numpad-key:hover,
+    .numpad-key:focus-visible {
+        border-color: hsl(var(--primary));
+        background: hsl(var(--accent));
+    }
+    .numpad-key:active {
+        transform: scale(0.93);
+    }
+    .numpad-key.key-0 {
+        grid-column: span 2;
+    }
+    .numpad-key.key-action {
+        background: hsl(var(--primary));
+        color: hsl(var(--primary-fg));
+        border-color: hsl(var(--primary));
+        font-family: 'DM Sans', sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+    }
+    .numpad-key.key-action:hover,
+    .numpad-key.key-action:focus-visible {
+        background: hsl(38 92% 42%);
+    }
+    .numpad-key.key-del {
+        background: #fff1f2;
+        border-color: hsl(var(--destructive) / 0.3);
+        color: hsl(var(--destructive));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .numpad-key.key-del:hover {
+        background: hsl(var(--destructive));
+        color: #fff;
+    }
+    .numpad-close {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 0.6rem;
+        border-radius: var(--border-radius);
+        border: 1px dashed hsl(var(--border));
+        background: transparent;
+        font-size: 0.82rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: hsl(var(--muted-fg));
+        transition: all 0.15s;
+    }
+    .numpad-close:hover {
+        background: hsl(var(--muted));
+    }
+
+    /* End Num Pad */
+
     /* ── COLOR SWATCHES ── */
     .swatch-grid {
         display: grid;
