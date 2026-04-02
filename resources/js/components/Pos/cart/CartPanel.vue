@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ShoppingCart } from 'lucide-vue-next';
-import type { CartItem as CartItemType, Customer } from '@/types';
+import type { CartItem as CartItemType, Customer, TaxSettings } from '@/types';
 import CartHeader from './CartHeader.vue';
 import CartItem from './CartItem.vue';
 import CartSummary from './CartSummary.vue';
@@ -10,6 +10,10 @@ const { cart } = defineProps<{
     subtotal: number;
     appliedDiscount: number;
     totalDue: number;
+    gstAmount: number;
+    vatAmount: number;
+    grandTotal: number;
+    taxSettings: TaxSettings;
     discountAmount: number | null;
     discountInput: string;
     hasCartItems: boolean;
@@ -81,6 +85,10 @@ const emit = defineEmits<{
             :subtotal="subtotal"
             :appliedDiscount="appliedDiscount"
             :totalDue="totalDue"
+            :gstAmount="gstAmount"
+            :vatAmount="vatAmount"
+            :grandTotal="grandTotal"
+            :taxSettings="taxSettings"
             :discountAmount="discountAmount"
             :discountInput="discountInput"
             :hasCartItems="hasCartItems"

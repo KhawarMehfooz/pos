@@ -63,6 +63,14 @@ export type TransactionItem = {
     product_image?: string | null;
 };
 
+export interface TaxSettings {
+    gst_enabled: boolean;
+    gst_percentage: number;
+    vat_enabled: boolean;
+    vat_percentage: number;
+    currency_symbol: string;
+}
+
 export interface Transaction {
     product_id: number;
     product_name: string;

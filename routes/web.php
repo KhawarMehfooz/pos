@@ -5,6 +5,7 @@ use App\Http\Controllers\TransactionController;
 use App\Models\Category;
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\Setting;
 use Filament\Facades\Filament;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -52,10 +53,19 @@ Route::get('pos', function (Request $request) {
         ->limit(5)
         ->get();
 
+    $setting = Setting::current();
+
     return Inertia::render('Pos', [
         'categories' => $categories,
         'products' => $products,
-        'customers' => $customers
+        'customers' => $customers,
+        'taxSettings' => [
+            'gst_enabled'     => $setting->gst_enabled,
+            'gst_percentage'  => (float) $setting->gst_percentage,
+            'vat_enabled'     => $setting->vat_enabled,
+            'vat_percentage'  => (float) $setting->vat_percentage,
+            'currency_symbol' => $setting->currency_symbol,
+        ],
     ]);
 })->middleware(['auth'])->name('pos');
 

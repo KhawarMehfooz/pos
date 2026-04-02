@@ -20,7 +20,7 @@ import { LayoutDashboard, LogOut, Settings } from 'lucide-vue-next';
                 </div>
 
                 <div class="header-right">
-                    <a href="#" class="nav-btn">
+                    <a href="/admin/settings-page" class="nav-btn">
                         <Settings />
                         Settings
                     </a>

@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { Check, Pause, Tag, X } from 'lucide-vue-next';
-import type { CartItem } from '@/types';
+import type { CartItem, TaxSettings } from '@/types';
 
-const {subtotal, appliedDiscount, totalDue, cart, discountInput, hasCartItems, discountAmount, canApplyDiscount} = defineProps<{
+const { subtotal, appliedDiscount, totalDue, gstAmount, vatAmount, grandTotal, taxSettings, cart, discountInput, hasCartItems, discountAmount, canApplyDiscount } = defineProps<{
     subtotal: number;
     appliedDiscount: number;
     totalDue: number;
+    gstAmount: number;
+    vatAmount: number;
+    grandTotal: number;
+    taxSettings: TaxSettings;
     cart: CartItem[];
     discountInput: string;
     hasCartItems: boolean;
@@ -27,7 +31,7 @@ const emit = defineEmits<{
             <div class="summary-row">
                 <span class="summary-label">Subtotal</span>
                 <span class="summary-value" id="subtotalVal"
-                    >PKR {{ subtotal.toFixed(2) }}</span
+                    >{{ taxSettings.currency_symbol }} {{ subtotal.toFixed(2) }}</span
                 >
             </div>
             <div
@@ -35,10 +39,20 @@ const emit = defineEmits<{
                 class="summary-row"
                 id="discountRow"
             >
-                <span class="summary-label">Discount </span>
+                <span class="summary-label">Discount</span>
                 <span class="summary-value discount" id="discountVal"
-                    >PKR {{ appliedDiscount.toFixed(2) }}</span
+                    >{{ taxSettings.currency_symbol }} {{ appliedDiscount.toFixed(2) }}</span
                 >
+            </div>
+
+            <div v-if="taxSettings.gst_enabled" class="summary-row">
+                <span class="summary-label">GST ({{ taxSettings.gst_percentage }}%)</span>
+                <span class="summary-value">{{ taxSettings.currency_symbol }} {{ gstAmount.toFixed(2) }}</span>
+            </div>
+
+            <div v-if="taxSettings.vat_enabled" class="summary-row">
+                <span class="summary-label">VAT ({{ taxSettings.vat_percentage }}%)</span>
+                <span class="summary-value">{{ taxSettings.currency_symbol }} {{ vatAmount.toFixed(2) }}</span>
             </div>
 
             <hr class="summary-divider" />
@@ -46,7 +60,7 @@ const emit = defineEmits<{
             <div class="summary-total-row">
                 <span class="summary-total-label">Total Due</span>
                 <span class="summary-total-value" id="totalVal"
-                    >PKR {{ totalDue.toFixed(2) }}</span
+                    >{{ taxSettings.currency_symbol }} {{ grandTotal.toFixed(2) }}</span
                 >
             </div>
 
@@ -84,7 +98,7 @@ const emit = defineEmits<{
                 <span class="discount-tag">
                     <Tag :size="14" />
                     <span id="discountTagLabel"
-                        >PKR {{ appliedDiscount.toFixed(2) }} Discount
+                        >{{ taxSettings.currency_symbol }} {{ appliedDiscount.toFixed(2) }} Discount
                         Applied</span
                     >
                     <button @click="emit('remove-discount')" title="Remove Discount">
@@ -102,7 +116,7 @@ const emit = defineEmits<{
                 <Check :size="18" />
                 <span>
                     Charge
-                    <span>PKR {{ totalDue.toFixed(2) }}</span>
+                    <span>{{ taxSettings.currency_symbol }} {{ grandTotal.toFixed(2) }}</span>
                     <div class="charge-btn-sub">Tap to enter payment</div>
                 </span>
             </button>

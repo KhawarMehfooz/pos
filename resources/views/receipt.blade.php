@@ -25,11 +25,13 @@
 
   {{-- Header / Store Info --}}
   <div class="receipt-header">
-    <div class="receipt-store">My Store</div>
+    <div class="receipt-store">{{ $setting->store_name }}</div>
+    @if($setting->store_address || $setting->store_phone)
     <div class="receipt-store-sub">
-      123 Main Street, City, State 00000<br>
-      Tel: +1 (000) 000-0000
+      @if($setting->store_address){{ $setting->store_address }}<br>@endif
+      @if($setting->store_phone)Tel: {{ $setting->store_phone }}@endif
     </div>
+    @endif
     <div class="receipt-date">
       {{ $transaction->created_at->format('d M Y, h:i A') }}
     </div>
@@ -74,21 +76,42 @@
   <hr class="receipt-divider">
 
   {{-- Totals --}}
+  @php
+    $cur     = $setting->currency_symbol;
+    $preTax  = $transaction->subtotal - $transaction->discount;
+    $gstAmount = $setting->gst_enabled ? round($preTax * $setting->gst_percentage / 100, 2) : 0;
+    $vatAmount = $setting->vat_enabled ? round($preTax * $setting->vat_percentage / 100, 2) : 0;
+  @endphp
+
   <div class="receipt-row">
     <span>Subtotal</span>
-    <span>{{ number_format($transaction->subtotal, 2) }}</span>
+    <span>{{ $cur }} {{ number_format($transaction->subtotal, 2) }}</span>
   </div>
 
   @if($transaction->discount > 0)
     <div class="receipt-row discount">
       <span>Discount</span>
-      <span>- {{ number_format($transaction->discount, 2) }}</span>
+      <span>- {{ $cur }} {{ number_format($transaction->discount, 2) }}</span>
+    </div>
+  @endif
+
+  @if($setting->gst_enabled)
+    <div class="receipt-row tax">
+      <span>GST ({{ $setting->gst_percentage }}%)</span>
+      <span>{{ $cur }} {{ number_format($gstAmount, 2) }}</span>
+    </div>
+  @endif
+
+  @if($setting->vat_enabled)
+    <div class="receipt-row tax">
+      <span>VAT ({{ $setting->vat_percentage }}%)</span>
+      <span>{{ $cur }} {{ number_format($vatAmount, 2) }}</span>
     </div>
   @endif
 
   <div class="receipt-row total">
     <span>Total</span>
-    <span>{{ number_format($transaction->grand_total, 2) }}</span>
+    <span>{{ $cur }} {{ number_format($transaction->grand_total, 2) }}</span>
   </div>
 
   @if($transaction->status === 'completed')
@@ -96,13 +119,13 @@
 
     <div class="receipt-row paid">
       <span>Paid</span>
-      <span>{{ number_format($transaction->paid_amount, 2) }}</span>
+      <span>{{ $cur }} {{ number_format($transaction->paid_amount, 2) }}</span>
     </div>
 
     @if($transaction->change_amount > 0)
     <div class="receipt-change">
       Change
-      <strong>{{ number_format($transaction->change_amount, 2) }}</strong>
+      <strong>{{ $cur }} {{ number_format($transaction->change_amount, 2) }}</strong>
     </div>
     @endif
   @endif

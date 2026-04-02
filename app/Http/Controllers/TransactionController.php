@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\Transaction;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
@@ -33,7 +34,8 @@ class TransactionController extends Controller
 
         $transaction->load(['items', 'customer']);
 
-        $receiptHtml = view('receipt', compact('transaction'))->render();
+        $setting = Setting::current();
+        $receiptHtml = view('receipt', compact('transaction', 'setting'))->render();
 
         return response()->json([
             'success' => true,
@@ -47,6 +49,8 @@ class TransactionController extends Controller
     {
         $transaction->load(['items', 'customer']);
 
-        return view('receipt', compact('transaction'));
+        $setting = Setting::current();
+
+        return view('receipt', compact('transaction', 'setting'));
     }
 }

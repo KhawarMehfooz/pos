@@ -14,6 +14,7 @@ import type {
     Customer,
     Paginated,
     Product,
+    TaxSettings,
     TransactionItem,
 } from '@/types';
 
@@ -22,6 +23,7 @@ const props = defineProps<{
     categories: Category[];
     activeCategoryId?: number;
     customers: Customer[];
+    taxSettings: TaxSettings;
 }>();
 
 const searchTerm = ref('');
@@ -189,6 +191,18 @@ const totalDue = computed(() => {
     return Math.max(subtotal.value - appliedDiscount.value, 0);
 });
 
+const gstAmount = computed(() => {
+    if (!props.taxSettings.gst_enabled) return 0;
+    return Math.round(totalDue.value * props.taxSettings.gst_percentage) / 100;
+});
+
+const vatAmount = computed(() => {
+    if (!props.taxSettings.vat_enabled) return 0;
+    return Math.round(totalDue.value * props.taxSettings.vat_percentage) / 100;
+});
+
+const grandTotal = computed(() => totalDue.value + gstAmount.value + vatAmount.value);
+
 /**
  * Whether the cart currently has items.
  */
@@ -338,6 +352,10 @@ watch(
             :subtotal="subtotal"
             :appliedDiscount="appliedDiscount"
             :totalDue="totalDue"
+            :gstAmount="gstAmount"
+            :vatAmount="vatAmount"
+            :grandTotal="grandTotal"
+            :taxSettings="taxSettings"
             :discountAmount="discountAmount"
             :discountInput="discountInput"
             :hasCartItems="hasCartItems"
@@ -363,7 +381,7 @@ watch(
     </div>
 
     <NumPad
-        :total-due="totalDue"
+        :total-due="grandTotal"
         :open="isNumpadOpen"
         @close="closeNumpad"
         @process-transaction="processTransaction"
