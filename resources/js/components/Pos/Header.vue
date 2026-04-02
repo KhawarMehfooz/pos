@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { LayoutDashboard, LogOut, Settings } from 'lucide-vue-next';
 
+defineProps<{
+    storeName: string;
+}>();
 </script>
 
 <template>
@@ -16,7 +19,7 @@ import { LayoutDashboard, LogOut, Settings } from 'lucide-vue-next';
 
                 <div class="store-name">
                     <span class="logo-dot"></span>
-                    POINT OF SALE SYSTEM
+                    {{ storeName }}
                 </div>
 
                 <div class="header-right">

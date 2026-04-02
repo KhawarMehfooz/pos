@@ -59,6 +59,7 @@ Route::get('pos', function (Request $request) {
         'categories' => $categories,
         'products' => $products,
         'customers' => $customers,
+        'storeName' => $setting->store_name,
         'taxSettings' => [
             'gst_enabled'     => $setting->gst_enabled,
             'gst_percentage'  => (float) $setting->gst_percentage,

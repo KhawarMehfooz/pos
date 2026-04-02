@@ -24,6 +24,7 @@ const props = defineProps<{
     activeCategoryId?: number;
     customers: Customer[];
     taxSettings: TaxSettings;
+    storeName: string;
 }>();
 
 const searchTerm = ref('');
@@ -331,7 +332,7 @@ watch(
 </script>
 
 <template>
-    <Header />
+    <Header :store-name="props.storeName" />
 
     <div class="pos-layout">
         <div class="product-panel">
