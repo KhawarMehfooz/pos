@@ -5,7 +5,6 @@ import { createApp, h } from 'vue';
 import '../css/app.css';
 import vSelect from "vue-select";
 import "vue-select/dist/vue-select.css";
-import { initializeTheme } from './composables/useAppearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
