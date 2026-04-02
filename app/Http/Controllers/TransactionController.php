@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\Transaction;
 use App\Services\TransactionService;
 use Illuminate\Http\Request;
 
@@ -30,10 +31,22 @@ class TransactionController extends Controller
             $request->paid_amount ?? 0
         );
 
+        $transaction->load(['items', 'customer']);
+
+        $receiptHtml = view('receipt', compact('transaction'))->render();
+
         return response()->json([
             'success' => true,
             'transaction_id' => $transaction->id,
             'message' => 'Transaction created successfully',
+            'receipt_html' => $receiptHtml,
         ]);
+    }
+
+    public function receipt(Transaction $transaction)
+    {
+        $transaction->load(['items', 'customer']);
+
+        return view('receipt', compact('transaction'));
     }
 }

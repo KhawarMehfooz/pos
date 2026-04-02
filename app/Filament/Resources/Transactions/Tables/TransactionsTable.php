@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\Transactions\Tables;
 
+use App\Models\Transaction;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
@@ -78,8 +81,17 @@ class TransactionsTable
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                ViewAction::make(),
-                // EditAction::make(),
+                Action::make('receipt')
+                    ->label('Receipt')
+                    ->icon(Heroicon::OutlinedPrinter)
+                    ->modalContent(fn(Transaction $record) => view('filament.receipt-modal', [
+                        'url' => route('transactions.receipt', $record),
+                    ]))
+                    ->modalHeading(fn(Transaction $record) => 'Receipt #' . str_pad($record->id, 3, '0', STR_PAD_LEFT))
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Close')
+                    ->modalWidth('lg'),
+                // ViewAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -1,0 +1,4 @@
+<iframe
+    src="{{ $url }}"
+    style="width: 100%; height: 70vh; border: none; border-radius: 8px;"
+></iframe>

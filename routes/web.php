@@ -60,5 +60,6 @@ Route::get('pos', function (Request $request) {
 })->middleware(['auth'])->name('pos');
 
 Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store')->middleware(['auth']);
+Route::get('/transactions/{transaction}/receipt', [TransactionController::class, 'receipt'])->name('transactions.receipt')->middleware(['auth']);
 
 require __DIR__ . '/settings.php';

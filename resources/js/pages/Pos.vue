@@ -82,6 +82,7 @@ const debouncedCustomerSearch = debounce(searchCustomers, 500);
 const cart = ref<CartItem[]>([]);
 
 const isNumpadOpen = ref(false);
+const receiptHtml = ref<string | null>(null);
 
 function openNumpad() {
     isNumpadOpen.value = true;
@@ -229,7 +230,7 @@ function clearCart() {
     discountInput.value = '';
 }
 
-function processTransaction(status: 'hold' | 'completed', paidAmount = 0) {
+async function processTransaction(status: 'hold' | 'completed', paidAmount = 0) {
     if (!hasCartItems.value) return alert('Cart is empty');
 
     const payload = {
@@ -254,22 +255,47 @@ function processTransaction(status: 'hold' | 'completed', paidAmount = 0) {
         }),
     };
 
-    router.post('/transactions', payload, {
-        onSuccess: () => {
-            alert(
-                `Transaction ${status === 'completed' ? 'completed' : 'held'} successfully!`,
-            );
-            clearCart();
-            selectedCustomer.value = null;
-            customerSearch.value = '';
-            discountAmount.value = null;
-            discountInput.value = '';
-        },
-        onError: (errors) => {
-            console.error(errors);
-            alert('Failed to create transaction.');
-        },
-    });
+    try {
+        const csrfToken = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('XSRF-TOKEN='))
+            ?.split('=')[1];
+        const response = await fetch('/transactions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-XSRF-TOKEN': decodeURIComponent(csrfToken ?? ''),
+            },
+            body: JSON.stringify(payload),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.message ?? 'Request failed');
+        receiptHtml.value = data.receipt_html;
+        closeNumpad();
+        clearCart();
+        selectedCustomer.value = null;
+        customerSearch.value = '';
+        discountAmount.value = null;
+        discountInput.value = '';
+    } catch (error) {
+        console.error(error);
+        alert('Failed to create transaction.');
+    }
+}
+
+function closeReceipt() {
+    receiptHtml.value = null;
+}
+
+function printReceipt() {
+    const win = window.open('', '_blank', 'width=400,height=600');
+    if (win) {
+        win.document.write(receiptHtml.value!);
+        win.document.close();
+        win.focus();
+        win.print();
+    }
 }
 
 /**
@@ -337,9 +363,68 @@ watch(
     </div>
 
     <NumPad
-        :total-due="totalDue" 
-        :open="isNumpadOpen" 
-        @close="closeNumpad" 
-        @process-transaction="processTransaction" 
+        :total-due="totalDue"
+        :open="isNumpadOpen"
+        @close="closeNumpad"
+        @process-transaction="processTransaction"
     />
+
+    <!-- Receipt Modal -->
+    <Teleport to="body">
+        <div v-if="receiptHtml" class="receipt-modal-backdrop" @click.self="closeReceipt">
+            <div class="receipt-modal">
+                <div class="receipt-modal-actions">
+                    <button class="btn btn-outline" @click="printReceipt">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                        Print
+                    </button>
+                    <button class="btn btn-ghost" @click="closeReceipt">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                        Close
+                    </button>
+                </div>
+                <iframe :srcdoc="receiptHtml" class="receipt-frame" />
+            </div>
+        </div>
+    </Teleport>
 </template>
+
+<style scoped>
+.receipt-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(28, 25, 23, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(2px);
+}
+
+.receipt-modal {
+    background: var(--surface-card, #fff);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(120, 53, 15, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    width: 500px;
+    height: 90vh;
+    max-height: 90vh;
+}
+
+.receipt-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-subtle, #e7e5e4);
+}
+
+.receipt-frame {
+    width: 100%;
+    flex: 1;
+    border: none;
+    min-height: 500px;
+}
+</style>
