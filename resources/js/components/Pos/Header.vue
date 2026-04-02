@@ -1,9 +1,16 @@
 <script setup lang="ts">
+import { router } from '@inertiajs/vue3';
 import { LayoutDashboard, LogOut, Settings } from 'lucide-vue-next';
+import { logout } from '@/routes';
 
 defineProps<{
     storeName: string;
 }>();
+
+const handleLogout = () => {
+    router.flushAll();
+    router.visit(logout(), { method: 'post' });
+};
 </script>
 
 <template>
@@ -28,7 +35,7 @@ defineProps<{
                         Settings
                     </a>
 
-                    <button class="nav-btn danger">
+                    <button class="nav-btn danger" @click="handleLogout">
                         <LogOut />
                         Logout
                     </button>
