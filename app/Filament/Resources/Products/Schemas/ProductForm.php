@@ -154,10 +154,11 @@ class ProductForm
                             ->numeric()
                             ->minValue(0)
                             ->step(1)
-                            ->live(onBlur: true)                        // <-- so min_stock_level can react
+                            ->required(fn(Get $get): bool => (bool) $get('track_stock'))
+                            ->live(onBlur: true)
                             ->rules([
                                 fn(Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                                    if (! $get('track_stock')) return;  // skip when hidden
+                                    if (! $get('track_stock')) return;
 
                                     if ((float) $value < 0) {
                                         $fail('Stock quantity cannot be negative.');
@@ -174,6 +175,7 @@ class ProductForm
                             ->numeric()
                             ->minValue(0)
                             ->step(1)
+                            ->required(fn(Get $get): bool => (bool) $get('track_stock'))
                             ->helperText('Must be less than or equal to current stock quantity.')
                             ->rules([
                                 fn(Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {

@@ -15,11 +15,15 @@ class CategoryForm
         return $schema
             ->components([
                 TextInput::make('category_name')
-                    ->required()
                     ->label('Category Name')
+                    ->prefixIcon('heroicon-o-tag')
+                    ->placeholder('e.g. Beverages')
+                    ->required()
                     ->maxLength(30),
+
                 Select::make('parent_id')
                     ->label('Parent Category')
+                    ->prefixIcon('heroicon-o-folder')
                     ->options(
                         fn () => Category::whereNull('parent_id')
                             ->pluck('category_name', 'id')
@@ -27,9 +31,14 @@ class CategoryForm
                     ->searchable()
                     ->placeholder('None (Top-level Category)')
                     ->nullable(),
+
                 Toggle::make('is_active')
                     ->label('Active')
-                    ->default(true),
+                    ->default(true)
+                    ->inline(false)
+                    ->onIcon('heroicon-o-check-circle')
+                    ->offIcon('heroicon-o-x-circle')
+                    ->helperText('Inactive categories and their products won\'t appear in the POS.'),
             ]);
     }
 }

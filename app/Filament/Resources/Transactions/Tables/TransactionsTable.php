@@ -39,6 +39,19 @@ class TransactionsTable
                     ])
                     ->formatStateUsing(fn($state) => ucfirst($state)),
 
+                TextColumn::make('payment_method')
+                    ->label('Payment')
+                    ->badge()
+                    ->icon(fn ($state) => match ($state) {
+                        'card' => 'heroicon-o-credit-card',
+                        default => 'heroicon-o-banknotes',
+                    })
+                    ->colors([
+                        'success' => 'cash',
+                        'info'    => 'card',
+                    ])
+                    ->formatStateUsing(fn($state) => ucfirst($state)),
+
                 TextColumn::make('subtotal')
                     ->label('Subtotal')
                     ->money('PKR')
