@@ -42,7 +42,6 @@ function numpadExact() {
 
 function processPayment() {
     const amount = parseFloat(value.value);
-    console.log('Processing payment:', amount);
 }
 
 function handleKeyboard(e: KeyboardEvent) {

@@ -85,7 +85,7 @@ const debouncedCustomerSearch = debounce(searchCustomers, 500);
 const cart = ref<CartItem[]>([]);
 
 const isNumpadOpen = ref(false);
-const receiptHtml = ref<string | null>(null);
+const lastTransactionId = ref<number | null>(null);
 
 function openNumpad() {
     isNumpadOpen.value = true;
@@ -286,7 +286,7 @@ async function processTransaction(status: 'hold' | 'completed', paidAmount = 0) 
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message ?? 'Request failed');
-        receiptHtml.value = data.receipt_html;
+        lastTransactionId.value = data.transaction_id;
         closeNumpad();
         clearCart();
         selectedCustomer.value = null;
@@ -300,16 +300,13 @@ async function processTransaction(status: 'hold' | 'completed', paidAmount = 0) 
 }
 
 function closeReceipt() {
-    receiptHtml.value = null;
+    lastTransactionId.value = null;
 }
 
 function printReceipt() {
-    const win = window.open('', '_blank', 'width=400,height=600');
+    const win = window.open(`/transactions/${lastTransactionId.value}/receipt`, '_blank', 'width=400,height=600');
     if (win) {
-        win.document.write(receiptHtml.value!);
-        win.document.close();
         win.focus();
-        win.print();
     }
 }
 
@@ -390,7 +387,7 @@ watch(
 
     <!-- Receipt Modal -->
     <Teleport to="body">
-        <div v-if="receiptHtml" class="receipt-modal-backdrop" @click.self="closeReceipt">
+        <div v-if="lastTransactionId" class="receipt-modal-backdrop" @click.self="closeReceipt">
             <div class="receipt-modal">
                 <div class="receipt-modal-actions">
                     <button class="btn btn-outline" @click="printReceipt">
@@ -402,7 +399,7 @@ watch(
                         Close
                     </button>
                 </div>
-                <iframe :srcdoc="receiptHtml" class="receipt-frame" />
+                <iframe :src="`/transactions/${lastTransactionId}/receipt`" class="receipt-frame" sandbox="allow-same-origin allow-scripts allow-popups" />
             </div>
         </div>
     </Teleport>

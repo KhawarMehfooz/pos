@@ -20,16 +20,27 @@ class TransactionService
     ): Transaction {
         return DB::transaction(function () use ($customerId, $cartItems, $discount, $status, $paidAmount) {
 
+            // Load all products once and validate stock
+            $products = [];
             foreach ($cartItems as $item) {
                 $product = Product::find($item['product_id']);
                 if (!$product) {
                     throw new ModelNotFoundException("Product ID {$item['product_id']} not found.");
                 }
-
                 if ($product->track_stock && $product->stock_quantity < $item['quantity']) {
                     throw new \Exception("Insufficient stock for product {$product->product_name}. Requested: {$item['quantity']}, Available: {$product->stock_quantity}");
                 }
+                $products[$item['product_id']] = $product;
             }
+
+            // Compute subtotal from server-side prices and cap discount
+            $subtotal = 0;
+            foreach ($cartItems as $item) {
+                $product = $products[$item['product_id']];
+                $price = $product->sale_price ?? $product->retail_price;
+                $subtotal += $price * $item['quantity'];
+            }
+            $discount = min($discount, $subtotal);
 
             $transaction = Transaction::create([
                 'customer_id' => $customerId,
@@ -38,15 +49,16 @@ class TransactionService
             ]);
 
             foreach ($cartItems as $item) {
-                $product = Product::find($item['product_id']); 
+                $product = $products[$item['product_id']];
+                $price = $product->sale_price ?? $product->retail_price;
 
                 TransactionItem::create([
                     'transaction_id' => $transaction->id,
                     'product_id' => $product->id,
                     'product_name' => $product->product_name,
-                    'product_price' => $item['product_price'],
+                    'product_price' => $price,
                     'quantity' => $item['quantity'],
-                    'total' => $item['product_price'] * $item['quantity'],
+                    'total' => $price * $item['quantity'],
                     'sku' =>  $product->sku,
                     'barcode' =>  $product->barcode,
                 ]);

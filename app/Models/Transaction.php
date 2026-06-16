@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToUser;
 use App\Models\Setting;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, BelongsToUser;
     
     protected $fillable = [
         'customer_id',

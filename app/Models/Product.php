@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\BelongsToUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
-    use SoftDeletes, HasFactory;
+    use SoftDeletes, HasFactory, BelongsToUser;
 
     protected $fillable = [
         "product_name",
@@ -29,7 +30,9 @@ class Product extends Model
     protected $hidden = [
         'deleted_at',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'purchase_price',
+        'min_stock_level',
     ];
 
     protected function casts()
