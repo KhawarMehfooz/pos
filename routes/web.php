@@ -18,13 +18,17 @@ Route::get('/', function () {
 
 Route::get('pos', function (Request $request) {
 
-    $categoryId = $request->input('category');
-    $search = $request->input('search');
+    $categoryId  = $request->input('category');
+    $search      = $request->input('search');
+    $searchMode  = $request->input('search_mode', 'name'); // 'name' | 'barcode'
 
     $query = ProductResource::getEloquentQuery()
         ->availableForSale()
         ->when($categoryId && $categoryId != 0, fn($q) => $q->where('category_id', $categoryId))
-        ->when($search, fn($q) => $q->where('product_name', 'like', "%{$search}%"));
+        ->when($search && $searchMode === 'name', fn($q) => $q->where('product_name', 'like', "%{$search}%"))
+        ->when($search && $searchMode === 'barcode', fn($q) => $q->where(
+            fn($q2) => $q2->where('barcode', $search)->orWhere('sku', $search)
+        ));
 
     $products = $query->paginate(16)->withQueryString();
 

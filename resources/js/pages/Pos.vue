@@ -30,6 +30,8 @@ const props = defineProps<{
 }>();
 
 const searchTerm = ref('');
+const searchMode = ref<'name' | 'barcode'>('name');
+const pendingBarcodeSearch = ref(false);
 const activeCategoryId = ref(props.activeCategoryId ?? 0);
 const discountInput = ref('');
 const discountAmount = ref<number | null>(null);
@@ -60,7 +62,7 @@ function filterByCategory(categoryId: number) {
     activeCategoryId.value = categoryId;
     router.get(
         '/pos',
-        { category: categoryId, search: searchTerm.value },
+        { category: categoryId, search: searchTerm.value, search_mode: searchMode.value },
         {
             preserveScroll: true,
             preserveState: true,
@@ -70,9 +72,12 @@ function filterByCategory(categoryId: number) {
 }
 
 function searchProducts() {
+    if (searchMode.value === 'barcode' && searchTerm.value) {
+        pendingBarcodeSearch.value = true;
+    }
     router.get(
         '/pos',
-        { category: activeCategoryId.value, search: searchTerm.value },
+        { category: activeCategoryId.value, search: searchTerm.value, search_mode: searchMode.value },
         {
             preserveScroll: true,
             preserveState: true,
@@ -82,6 +87,19 @@ function searchProducts() {
 }
 
 const debouncedSearch = debounce(searchProducts, 500);
+
+function handleSearch() {
+    if (searchMode.value === 'barcode') {
+        searchProducts();
+    } else if (searchTerm.value.length === 0 || searchTerm.value.length >= 3) {
+        debouncedSearch();
+    }
+}
+
+function toggleBarcodeMode() {
+    searchMode.value = searchMode.value === 'name' ? 'barcode' : 'name';
+    searchTerm.value = '';
+}
 const debouncedCustomerSearch = debounce(searchCustomers, 500);
 
 const cart = ref<CartItem[]>([]);
@@ -359,6 +377,24 @@ watch(
     },
     { deep: true },
 );
+
+watch(
+    () => props.products.data,
+    (data) => {
+        if (!pendingBarcodeSearch.value) return;
+        pendingBarcodeSearch.value = false;
+
+        if (data.length === 1) {
+            addToCart(data[0]);
+            searchTerm.value = '';
+            router.get(
+                '/pos',
+                { category: activeCategoryId.value },
+                { preserveScroll: true, preserveState: true, only: ['products'] },
+            );
+        }
+    },
+);
 </script>
 
 <template>
@@ -367,7 +403,12 @@ watch(
     <div class="pos-layout">
         <div class="product-panel">
             <!-- toolbar -->
-            <PosToolbar v-model:search="searchTerm" @search="debouncedSearch" />
+            <PosToolbar
+                v-model:search="searchTerm"
+                :barcode-mode="searchMode === 'barcode'"
+                @search="handleSearch"
+                @toggle-barcode-mode="toggleBarcodeMode"
+            />
 
             <CategoryTabs
                 :categories="categories"
