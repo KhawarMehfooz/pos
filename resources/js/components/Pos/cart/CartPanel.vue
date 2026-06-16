@@ -36,6 +36,8 @@ const emit = defineEmits<{
     (e: 'search-customer'): void;
     (e: 'clear-cart'): void;
     (e: 'charge-payment'): void;
+    (e: 'hold-order'): void;
+    (e: 'open-held-orders'): void;
 }>();
 </script>
 
@@ -49,7 +51,8 @@ const emit = defineEmits<{
             @update:search="emit('update-customer-search', $event)"
             @select-customer="emit('select-customer', $event)"
             @clear-cart="emit('clear-cart')"
-            @search-customer = "emit('search-customer')"
+            @search-customer="emit('search-customer')"
+            @open-held-orders="emit('open-held-orders')"
         />
 
         <!-- Cart Items -->
@@ -97,6 +100,7 @@ const emit = defineEmits<{
             @remove-discount="emit('remove-discount')"
             @update-discount-input="emit('update-discount-input', $event)"
             @charge-payment="emit('charge-payment')"
+            @hold-order="emit('hold-order')"
         />
     </aside>
 </template>

@@ -466,6 +466,25 @@
         background: #fff1f2;
         color: hsl(var(--destructive));
     }
+    .icon-btn.btn-hold:hover {
+        border-color: var(--primary-300);
+        background: var(--primary-50);
+        color: var(--primary-700);
+    }
+
+    .cart-actions .sub-btn {
+        flex: none;
+    }
+    .cart-actions .btn-hold:hover {
+        border-color: var(--primary-300);
+        background: var(--primary-50);
+        color: var(--primary-700);
+    }
+    .cart-actions .btn-clear:hover {
+        border-color: hsl(var(--destructive) / 0.35);
+        background: #fff1f2;
+        color: hsl(var(--destructive));
+    }
     .icon-btn svg {
         width: 13px;
         height: 13px;

@@ -22,6 +22,7 @@ const emit = defineEmits<{
     (e: 'remove-discount'): void
     (e: 'update-discount-input', value: string): void
     (e: 'charge-payment'): void
+    (e: 'hold-order'): void
 }>();
 </script>
 
@@ -122,7 +123,7 @@ const emit = defineEmits<{
             </button>
 
             <div class="sub-actions">
-                <button class="sub-btn" :disabled="cart.length === 0">
+                <button class="sub-btn" :disabled="cart.length === 0" @click="emit('hold-order')">
                     <Pause :size="12" />
                     Hold
                 </button>

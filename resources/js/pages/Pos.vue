@@ -5,6 +5,7 @@ import { computed, ref, watch } from 'vue';
 import CartPanel from '@/components/Pos/cart/CartPanel.vue';
 import CategoryTabs from '@/components/Pos/CategoryTabs.vue';
 import Header from '@/components/Pos/Header.vue';
+import HoldOrdersModal from '@/components/Pos/HoldOrdersModal.vue';
 import NumPad from '@/components/Pos/NumPad.vue';
 import PosToolbar from '@/components/Pos/PosToolbar.vue';
 import ProductGrid from '@/components/Pos/ProductGrid.vue';
@@ -12,6 +13,7 @@ import type {
     CartItem,
     Category,
     Customer,
+    HeldTransaction,
     Paginated,
     Product,
     TaxSettings,
@@ -85,6 +87,7 @@ const debouncedCustomerSearch = debounce(searchCustomers, 500);
 const cart = ref<CartItem[]>([]);
 
 const isNumpadOpen = ref(false);
+const isHoldModalOpen = ref(false);
 const lastTransactionId = ref<number | null>(null);
 
 function openNumpad() {
@@ -93,6 +96,34 @@ function openNumpad() {
 
 function closeNumpad() {
     isNumpadOpen.value = false;
+}
+
+function openHoldModal() {
+    isHoldModalOpen.value = true;
+}
+
+function closeHoldModal() {
+    isHoldModalOpen.value = false;
+}
+
+function resumeHeldOrder(transaction: HeldTransaction) {
+    clearCart();
+
+    if (transaction.customer) {
+        selectedCustomer.value = transaction.customer;
+    }
+
+    if (transaction.discount > 0) {
+        discountAmount.value = transaction.discount;
+    }
+
+    for (const item of transaction.items) {
+        if (item.product) {
+            cart.value.push({ product: item.product, quantity: item.quantity });
+        }
+    }
+
+    closeHoldModal();
 }
 
 /**
@@ -286,7 +317,9 @@ async function processTransaction(status: 'hold' | 'completed', paidAmount = 0) 
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message ?? 'Request failed');
-        lastTransactionId.value = data.transaction_id;
+        if (status === 'completed') {
+            lastTransactionId.value = data.transaction_id;
+        }
         closeNumpad();
         clearCart();
         selectedCustomer.value = null;
@@ -375,6 +408,8 @@ watch(
             @select-customer="selectedCustomer = $event"
             @search-customer="debouncedCustomerSearch(customerSearch)"
             @charge-payment="openNumpad"
+            @hold-order="processTransaction('hold', 0)"
+            @open-held-orders="openHoldModal"
         />
     </div>
 
@@ -383,6 +418,13 @@ watch(
         :open="isNumpadOpen"
         @close="closeNumpad"
         @process-transaction="processTransaction"
+    />
+
+    <HoldOrdersModal
+        :open="isHoldModalOpen"
+        :currency-symbol="props.taxSettings.currency_symbol"
+        @close="closeHoldModal"
+        @resume="resumeHeldOrder"
     />
 
     <!-- Receipt Modal -->

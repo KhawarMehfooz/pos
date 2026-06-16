@@ -71,13 +71,22 @@ export interface TaxSettings {
     currency_symbol: string;
 }
 
-export interface Transaction {
+export interface HeldTransactionItem {
+    id: number;
     product_id: number;
     product_name: string;
     product_price: number;
     quantity: number;
     total: number;
-    sku?: string | null;
-    barcode?: string | null;
-    product_image?: string | null;
+    product: Product | null;
+}
+
+export interface HeldTransaction {
+    id: number;
+    created_at: string;
+    customer: Customer | null;
+    discount: number;
+    subtotal: number;
+    grand_total: number;
+    items: HeldTransactionItem[];
 }

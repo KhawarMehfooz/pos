@@ -14,6 +14,7 @@ const emit = defineEmits<{
     (e: 'select-customer', customer: Customer): void;
     (e: 'search-customer'): void;
     (e: 'clear-cart'): void;
+    (e: 'open-held-orders'): void;
 }>();
 
 const walkInCustomer: Customer = {
@@ -49,15 +50,13 @@ const onSearch = (value: string) => {
         <div class="cart-header-row">
             <div class="cart-title">Cart</div>
             <div class="cart-actions">
-                <button class="icon-btn btn-hold" title="Hold order">
-                    <Pause />
+                <button class="sub-btn btn-hold" @click="emit('open-held-orders')">
+                    <Pause :size="12" />
+                    Held Orders
                 </button>
-                <button
-                    class="icon-btn btn-clear"
-                    title="Clear cart"
-                    @click="emit('clear-cart')"
-                >
-                    <Trash />
+                <button class="sub-btn btn-clear" @click="emit('clear-cart')">
+                    <Trash :size="12" />
+                    Clear
                 </button>
             </div>
         </div>
