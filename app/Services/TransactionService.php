@@ -16,9 +16,10 @@ class TransactionService
         array $cartItems,
         float $discount = 0,
         string $status = 'hold',
-        float $paidAmount = 0
+        float $paidAmount = 0,
+        string $paymentMethod = 'cash'
     ): Transaction {
-        return DB::transaction(function () use ($customerId, $cartItems, $discount, $status, $paidAmount) {
+        return DB::transaction(function () use ($customerId, $cartItems, $discount, $status, $paidAmount, $paymentMethod) {
 
             // Load all products once and validate stock
             $products = [];
@@ -43,9 +44,10 @@ class TransactionService
             $discount = min($discount, $subtotal);
 
             $transaction = Transaction::create([
-                'customer_id' => $customerId,
-                'status' => $status,
-                'discount' => $discount,
+                'customer_id'    => $customerId,
+                'status'         => $status,
+                'payment_method' => $paymentMethod,
+                'discount'       => $discount,
             ]);
 
             foreach ($cartItems as $item) {

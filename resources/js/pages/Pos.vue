@@ -294,13 +294,14 @@ function clearCart() {
     discountInput.value = '';
 }
 
-async function processTransaction(status: 'hold' | 'completed', paidAmount = 0) {
+async function processTransaction(status: 'hold' | 'completed', paidAmount = 0, paymentMethod: 'cash' | 'card' = 'cash') {
     if (!hasCartItems.value) return alert('Cart is empty');
 
     const payload = {
         customer_id: selectedCustomer.value?.id || null,
         discount: discountAmount.value || 0,
         status,
+        payment_method: paymentMethod,
         paid_amount: paidAmount,
         items: cart.value.map((item): TransactionItem => {
             const product = item.product;

@@ -33,13 +33,14 @@ class TransactionController extends Controller
     {
         // Validate the request
         $request->validate([
-            'customer_id' => 'nullable|exists:customers,id',
-            'discount' => 'nullable|numeric|min:0',
-            'status' => 'required|in:hold,completed',
-            'items' => 'required|array|min:1',
+            'customer_id'    => 'nullable|exists:customers,id',
+            'discount'       => 'nullable|numeric|min:0',
+            'status'         => 'required|in:hold,completed',
+            'payment_method' => 'required|in:cash,card',
+            'items'          => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'paid_amount' => 'required|numeric|min:0',
+            'items.*.quantity'   => 'required|integer|min:1',
+            'paid_amount'    => 'required|numeric|min:0',
         ]);
 
         // Create the transaction using the service
@@ -48,7 +49,8 @@ class TransactionController extends Controller
             $request->items,
             $request->discount ?? 0,
             $request->status,
-            $request->paid_amount ?? 0
+            $request->paid_amount ?? 0,
+            $request->payment_method
         );
 
         $transaction->load(['items', 'customer']);

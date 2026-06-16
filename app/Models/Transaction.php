@@ -14,6 +14,7 @@ class Transaction extends Model
     protected $fillable = [
         'customer_id',
         'status',
+        'payment_method',
         'subtotal',
         'discount',
         'tax_amount',
